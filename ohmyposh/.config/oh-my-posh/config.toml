@@ -21,7 +21,7 @@ console_title_template = '{{ .Shell }} in {{ .Folder }}'
     powerline_symbol = ''
     template = '  {{ path .Path .Location }} '
     background = 'p:orange'
-    foreground = 'p:white'
+    foreground = 'p:black'
 
     [blocks.segments.properties]
       style = 'folder'
