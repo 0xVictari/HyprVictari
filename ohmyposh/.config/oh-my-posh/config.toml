@@ -20,7 +20,7 @@ type = 'session'
 style = 'powerline'
 powerline_symbol = ''
 template = ' {{ if .SSHSession }} {{ end }}{{ .UserName }} '
-background = 'p:yellow'
+background = 'p:magenta'
 foreground = 'p:black'
 
 [[blocks.segments]]
@@ -174,3 +174,6 @@ orange = '#ff9e64'
 red = '#f7768e'
 white = '#c0caf5'
 yellow = '#e0af68'
+magenta = '#bb9af7'
+cyan = '#7dcfff'
+
