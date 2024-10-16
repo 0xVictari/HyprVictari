@@ -1,12 +1,18 @@
-# Oh-my-zsh installation path
-#ZSH=/usr/share/oh-my-zsh/
+# Created by Zap installer
+[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh" ] && source "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh"
+plug "zsh-users/zsh-autosuggestions"
+plug "zap-zsh/supercharge"
+plug "zap-zsh/zap-prompt"
+plug "zsh-users/zsh-syntax-highlighting"
+export POSH_THEME="$HOME/.config/oh-my-posh/config.toml"
+plug "wintermi/zsh-oh-my-posh"
+
+# Load and initialise completion system
+autoload -Uz compinit
+compinit
 
 # Powerlevel10k theme path
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-
-# List of plugins used
-plugins=()
-#source $ZSH/oh-my-zsh.sh
+#source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 
 # In case a command is not found, try to find the package that has it
 #function command_not_found_handler {
@@ -83,7 +89,7 @@ alias .5='cd ../../../../..'
 alias mkdir='mkdir -p'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+#[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # Define aliases.
 alias tree='tree -a -I .git'
@@ -93,3 +99,7 @@ alias ls="${aliases[eza]:-eza} -A --icons=auto"
 alias vim=nvim
 # Helpful aliases
 alias  c='clear' # clear terminal
+
+#Disable Zap before enabling oh-my-posh or starship
+#eval "$(starship init zsh)"
+#eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/config.toml)"
