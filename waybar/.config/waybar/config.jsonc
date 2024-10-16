@@ -7,11 +7,9 @@
     "custom/separator",
     "hyprland/workspaces",
     "custom/separator",
-    "tray"
+    "tray",
   ],
-  "modules-center": [
-    "hyprland/window"
-  ],
+  "modules-center": ["hyprland/window"],
   "modules-right": [
     "temperature",
     "memory",
@@ -21,15 +19,15 @@
     "network",
     "custom/separator",
     "clock",
-    "custom/powermenu"
+    "custom/powermenu",
   ],
   "custom/separator": {
     "exec": "echo \"|\"",
-    "format": "{}"
+    "format": "{}",
   },
   "tray": {
     "icon-size": 16,
-    "spacing": 8
+    "spacing": 8,
   },
   "clock": {
     // 24 hour
@@ -38,7 +36,7 @@
     "format": " 󰸗 {:%I:%M %p} ",
     "interval": 60,
     "tooltip": true,
-    "tooltip-format": "{:%d %B %H:%M}"
+    "tooltip-format": "{:%d %B %H:%M}",
   },
   "hyprland/workspaces": {
     "format": "{name}",
@@ -55,59 +53,49 @@
       "7": "7",
       "8": "8",
       "9": "9",
-      "10": "10"
-	  }
+      "10": "10",
+    },
   },
   "hyprland/window": {
-    "format": "{}"
+    "format": "{}",
   },
   "network": {
     "format": " 󰖩",
     // "tooltip": "{ifname}",
     "tooltip-format": "{essid}",
-    "interval": 2
+    "interval": 2,
   },
   "temperature": {
     "format": "{icon} {temperatureC}°C ",
     "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
     "critical-threshold": 80,
-    "format-icons": [
-      "",
-      "",
-      ""
-    ]
+    "format-icons": ["", "", ""],
   },
   "memory": {
     "format": "󰫗 {}% ",
-    "tooltip": "false"
+    "tooltip": "false",
   },
   "cpu": {
     "format": " {usage}% ",
-    "tooltip": "false"
+    "tooltip": "false",
   },
   "pulseaudio": {
     "format": " {volume}%",
     "scroll-step": 1,
-    "on-click": "pavucontrol"
+    "on-click": "pavucontrol",
   },
   "battery": {
     "format": "{capacity}% {icon}",
-    "format-icons": [
-      "",
-      "",
-      "",
-      "",
-      ""
-    ]
+    "format-icons": ["", "", "", "", ""],
   },
   "custom/powermenu": {
     "format": "  ",
     "tooltip": false,
-    "on-click": "exec wlogout -p layer-shell"
+    "on-click": "exec wlogout -p layer-shell",
   },
-  "custom/launcher":{
+  "custom/launcher": {
     "format": " ",
     "on-click": "wofi",
-    "on-click-right": "killall wofi"
-  }
+    "on-click-right": "killall wofi",
+  },
 }

@@ -1,80 +1,80 @@
 * {
-    font-family: "Fira Code";
-  }
-  
-  #waybar {
+    font-family: "GoMono Nerd Font";
+}
+
+#waybar {
     background: #171717;
     color: #fff;
-  }
-  
-  #clock {
+}
+
+#clock {
     color: #fff;
-  }
-  
-  #tray {
+}
+
+#tray {
     padding-left: 4px;
-  }
-  
-  #workspaces button:hover {
+}
+
+#workspaces button:hover {
     background-color: transparent;
-  }
-  
-  #workspaces button {
+}
+
+#workspaces button {
     color: #737373;
     padding-left: 4px;
     padding-right: 4px;
     border-radius: 0px;
-  }
-  
-  #workspaces button:hover {
+}
+
+#workspaces button:hover {
     background-color: #262626;
-  }
-  
-  #workspaces button.active {
+}
+
+#workspaces button.active {
     color: #84cc16;
-  }
-  
-  #window {
+}
+
+#window {
     color: #fff;
-  }
-  
-  #network {
+}
+
+#network {
     color: #3b82f6;
     margin-right: 8px;
-  }
-  
-  #pulseaudio {
+}
+
+#pulseaudio {
     color: #2b8379;
     margin-right: 4px;
-  }
-  
-  #cpu {
+}
+
+#cpu {
     color: #2082af;
     margin-right: 4px;
-  }
-  
-  #temperature {
+}
+
+#temperature {
     color: #c79e23;
     margin-right: 4px;
-  }
-  
-  #memory {
+}
+
+#memory {
     color: #962da7;
     margin-right: 4px;
-  }
-  
-  #custom-powermenu {
-    color: #a02e41;
-    padding-right: 2px;
-  }
+}
 
-  #custom-launcher {
-	font-size: 14px;
+#custom-powermenu {
+    color: #a02e41;
+    padding-right: 4px;
+}
+
+#custom-launcher {
+    font-size: 18px;
     margin-left: 4px;
     padding-left: 4px;
     padding-right: 4px;
     border-radius: 0px;
-	transition: none;
-    color: #89DCEB;
+    transition: none;
+    color: #89dceb;
     background: #161320;
 }
