@@ -103,3 +103,4 @@ alias  c='clear' # clear terminal
 #Disable Zap before enabling oh-my-posh or starship
 #eval "$(starship init zsh)"
 #eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/config.toml)"
+fastfetch

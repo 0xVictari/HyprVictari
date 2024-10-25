@@ -1,0 +1,96 @@
+* {
+    font-family: "GoMono Nerd Font";
+}
+
+#waybar {
+    background: #171717;
+    color: #fff;
+}
+
+#clock {
+    color: #fff;
+}
+
+#tray {
+    padding-left: 4px;
+}
+
+#workspaces button:hover {
+    background-color: transparent;
+}
+
+#workspaces button {
+    color: #737373;
+    padding-left: 4px;
+    padding-right: 4px;
+    border-radius: 0px;
+}
+
+#workspaces button:hover {
+    background-color: #262626;
+}
+
+#workspaces button.active {
+    color: #84cc16;
+}
+
+#window {
+    color: #fff;
+}
+
+#network {
+    color: #3b82f6;
+    margin-right: 8px;
+}
+
+#pulseaudio {
+    color: #2b8379;
+    margin-right: 4px;
+}
+
+#cpu {
+    color: #2082af;
+    margin-right: 4px;
+}
+
+#temperature {
+    color: #c79e23;
+    margin-right: 4px;
+}
+
+#memory {
+    color: #962da7;
+    margin-right: 4px;
+}
+
+#custom-powermenu {
+    color: #a02e41;
+    padding-right: 4px;
+}
+
+#custom-launcher {
+    font-size: 18px;
+    margin-left: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    border-radius: 0px;
+    transition: none;
+    color: #89dceb;
+    background: #161320;
+}
+
+#custom-pww {
+    background: #98bb6c;
+    color: #1f1f28;
+    padding: 0 10px;
+    margin-right: 10px;
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 0.25s;
+}
+
+#custom-pww.Paused,
+#custom-pww.Inactive {
+    opacity: 0.5;
+}
+/* color: #89dceb; */
