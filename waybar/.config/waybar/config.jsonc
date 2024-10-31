@@ -95,13 +95,13 @@
   "temperature": {
     "format": "{icon} {temperatureC}°C ",
     "tooltip-format": "CPU",
-    "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
+    "hwmon-path": "/sys/class/hwmon/hwmon1/temp1_input",
     "critical-threshold": 80,
     "format-icons": ["", "", ""],
   },
   "temperature#2": {
     "format": "{icon} {temperatureC}°C ",
-    "hwmon-path": "/sys/class/hwmon/hwmon4/temp2_input",
+    "hwmon-path": "/sys/class/hwmon/hwmon3/temp2_input",
     "tooltip-format": "GPU",
     "critical-threshold": 80,
     "format-icons": ["", "", ""],
