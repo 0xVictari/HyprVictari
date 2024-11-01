@@ -1,72 +1,71 @@
 # Main modifier key
-mainMod = super
 
 # Terminal (replace with your preferred terminal command)
-$mainMod + q
+super + q
     kitty
 
 # Kill active window
-$mainMod + c
+super + c
     xdotool getwindowfocus windowkill
 
 # Exit dwm (replace `pkill` with your preferred command to exit dwm)
-$mainMod + m
+super + m
     pkill dwm
 
 # File Manager (replace with your file manager command)
-$mainMod + e
+super + e
     nemo
 
 # Toggle floating (in dwm, usually mod + shift + space)
-$mainMod + v
+super + v
     xdotool getactivewindow windowminimize
 
 # Restart rofi or equivalent
-$mainMod + r
+super + r
     pkill rofi || rofi -show drun
 
 # Lock session (replace with appropriate lock screen command)
-$mainMod + l
+super + l
     loginctl lock-session
 
 # Toggle between layouts (dwindle-like)
-$mainMod + p
+super + p
     dwm-msg layout cycle
 
 # Move focus with mainMod + arrow keys
-$mainMod + left
+super + left
     xdotool key super+left
-$mainMod + right
+super + right
     xdotool key super+right
-$mainMod + up
+super + up
     xdotool key super+up
-$mainMod + down
+super + down
     xdotool key super+down
 
 # Switch workspaces with mainMod + [0-9]
-$mainMod + {1-9,0}
+super + {1-9,0}
     xdotool set_desktop [0-9]
 
 # Move active window to a workspace with mainMod + SHIFT + [0-9]
-$mainMod + shift + {1-9,0}
+super + shift + {1-9,0}
     xdotool set_desktop_for_window [0-9]
 
 # Special workspace (scratchpad)
-$mainMod + a
+super + a
     dwm-msg workspace toggle special:magic
 
 # Move to special workspace
-$mainMod + shift + a
+super + shift + a
     dwm-msg workspace send special:magic
 
 # Scroll through existing workspaces with mainMod + scroll
-$mainMod + button4
+super + button4
     xdotool set_desktop [workspace_prev]
-$mainMod + button5
+super + button5
     xdotool set_desktop [workspace_next]
 
 # Move/resize windows with mainMod + LMB/RMB and dragging
-$mainMod + button1
+super + button1
     xdotool windowmove
-$mainMod + button3
+super + button3
     xdotool windowsize
