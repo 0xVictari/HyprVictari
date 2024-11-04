@@ -17,12 +17,12 @@ super + e
     nemo
 
 # Toggle floating (in dwm, usually mod + shift + space)
-super + v
+super + f
     xdotool getactivewindow windowminimize
 
 # Restart rofi or equivalent
 super + r
-    pkill rofi || rofi -show drun
+    pkill rofi || rofi -show drun -show-icons
 
 # Lock session (replace with appropriate lock screen command)
 super + l
