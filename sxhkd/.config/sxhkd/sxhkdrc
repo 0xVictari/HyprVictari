@@ -4,21 +4,9 @@
 super + q
     kitty
 
-# Kill active window
-super + c
-    xdotool getwindowfocus windowkill
-
-# Exit dwm (replace `pkill` with your preferred command to exit dwm)
-super + m
-    pkill dwm
-
 # File Manager (replace with your file manager command)
 super + e
     nemo
-
-# Toggle floating (in dwm, usually mod + shift + space)
-super + f
-    xdotool getactivewindow windowminimize
 
 # Restart rofi or equivalent
 super + r
@@ -26,46 +14,8 @@ super + r
 
 # Lock session (replace with appropriate lock screen command)
 super + l
-    loginctl lock-session
+    cinnamon-screensaver-command -l
 
-# Toggle between layouts (dwindle-like)
-super + p
-    dwm-msg layout cycle
-
-# Move focus with mainMod + arrow keys
-super + left
-    xdotool key super+left
-super + right
-    xdotool key super+right
-super + up
-    xdotool key super+up
-super + down
-    xdotool key super+down
-
-# Switch workspaces with mainMod + [0-9]
-super + {1-9,0}
-    xdotool set_desktop [0-9]
-
-# Move active window to a workspace with mainMod + SHIFT + [0-9]
-super + shift + {1-9,0}
-    xdotool set_desktop_for_window [0-9]
-
-# Special workspace (scratchpad)
-super + a
-    dwm-msg workspace toggle special:magic
-
-# Move to special workspace
-super + shift + a
-    dwm-msg workspace send special:magic
-
-# Scroll through existing workspaces with mainMod + scroll
-super + button4
-    xdotool set_desktop [workspace_prev]
-super + button5
-    xdotool set_desktop [workspace_next]
-
-# Move/resize windows with mainMod + LMB/RMB and dragging
-super + button1
-    xdotool windowmove
-super + button3
-    xdotool windowsize
+# Screenshot
+super + shift + s
+    gnome-screenshot -a -c
