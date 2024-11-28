@@ -13,9 +13,9 @@ super + r
     pkill rofi || rofi -show drun -show-icons
 
 # Lock session (replace with appropriate lock screen command)
-super + l
+control + alt + l
     cinnamon-screensaver-command -l
 
-# Screenshot
+# Screenshot Area to Clipboard
 super + shift + s
-    gnome-screenshot -a -c
+    flameshot gui
