@@ -13,7 +13,7 @@
   ],
   "modules-center": ["custom/cava"],
   "modules-right": [
-    "cava",
+    //"cava",
     "temperature",
     "temperature#2",
     "memory",
