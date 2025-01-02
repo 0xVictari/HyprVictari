@@ -67,7 +67,7 @@ static const struct arg args[] = {
 	/* function format          argument */
 	{ run_command, " : %4s | ", "amixer sget Master | awk -F\"[][]\" '/%/ { print $2 }' | head -n1" },
 	{datetime, "%s |",           "%r"},
-	{ wifi_perc, "[ %s] ",         "wlp2s0"},
+	{ wifi_perc, "[ %s] ",         "wlp1s0"},
 	{ cpu_perc, "[CPU  %s%%] ", NULL	      },
 	{ ram_perc, "[RAM 󰍛 %s%%] ", NULL	      },
     { battery_perc, "[BAT   % s%%]   ", "BAT0" },

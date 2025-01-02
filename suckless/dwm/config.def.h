@@ -73,7 +73,9 @@ static const char *termcmd[]  = { "kitty", NULL };
 static const char *upvol[]      = { "/usr/bin/wpctl",   "set-volume", "@DEFAULT_AUDIO_SINK@",      "5%+",      NULL };
 static const char *downvol[]    = { "/usr/bin/wpctl",   "set-volume", "@DEFAULT_AUDIO_SINK@",      "5%-",      NULL };
 static const char *mutevol[]    = { "/usr/bin/wpctl",   "set-mute",   "@DEFAULT_AUDIO_SINK@",      "toggle",   NULL };
-static const char *mutemic[]    = { "/usr/bin/wpctl",   "set-source-mute",   "@DEFAULT_SOURCE@",      "toggle",   NULL };
+static const char *mutemic[]    = { "/usr/bin/wpctl",   "set-mute",   "@DEFAULT_SOURCE@",      "toggle",   NULL };
+static const char *brightup[]   = { "sudo", "brightness-control", "set", "5%+", NULL };
+static const char *brightdown[] = { "sudo", "brightness-control", "set", "5%-", NULL };
 
 #include "movestack.c"
 static const Key keys[] = {
@@ -82,6 +84,8 @@ static const Key keys[] = {
 	{ 0,                            XF86XK_AudioMute, spawn,   {.v = mutevol } },
 	{ 0,                       XF86XK_AudioRaiseVolume, spawn, {.v = upvol   } },
 	{ 0,                       XF86XK_AudioMicMute, spawn, {.v = mutemic   } },
+	{ 0,                       XF86XK_MonBrightnessUp,   spawn,  {.v = brightup } },
+	{ 0,                       XF86XK_MonBrightnessDown, spawn,  {.v = brightdown } },
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
