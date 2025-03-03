@@ -7,14 +7,15 @@
     "custom/separator",
     "hyprland/workspaces",
     "custom/separator",
-    "tray",
     "hyprland/window",
   ],
   "modules-center": ["custom/cava"],
   "modules-right": [
     //"cava",
+    "idle_inhibitor",
     "temperature",
     "temperature#2",
+    "pulseaudio",
     "memory",
     "cpu",
     "battery",
@@ -176,6 +177,13 @@
     "format-icons": ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"],
     "actions": {
       "on-click-right": "mode",
+    },
+  },
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": " ",
+      "deactivated": " ",
     },
   },
 }
