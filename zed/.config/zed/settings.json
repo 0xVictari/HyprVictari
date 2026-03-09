@@ -7,19 +7,38 @@
 // custom settings, run the open default settings command
 // from the command palette or from Zed application menu.
 {
-  "assistant": {
-    "default_model": {
-      "provider": "ollama",
-      "model": "llama3.2:latest"
+  "icon_theme": "Material Icon Theme",
+  "auto_update_extensions": {
+    "csharp": false,
+  },
+  "languages": {
+    "CSharp": {
+      "format_on_save": "off",
+      "formatter": "language_server",
+      "enable_language_server": true,
+      "tab_size": 4,
     },
-    "version": "2"
+  },
+  "lsp": {
+    "omnisharp": {
+      "settings": {
+        "FormattingOptions": {
+          "EnableEditorConfigSupport": false,
+          "OrganizeImports": false,
+        },
+        "RoslynExtensionsOptions": {
+          "EnableAnalyzersSupport": false,
+          "EnableImportCompletion": false,
+        },
+      },
+    },
   },
   "base_keymap": "VSCode",
-  "theme": "VSCode Dark Modern",
+  "theme": "Ayu Mirage",
   "ui_font_size": 14,
   "buffer_font_size": 14,
   "soft_wrap": "editor_width",
   "ui_font_family": "GoMono Nerd Font",
   "buffer_font_family": "GoMono Nerd Font",
-  "buffer_font_features": { "bold": false }
+  "buffer_font_features": { "bold": false },
 }
