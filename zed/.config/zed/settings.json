@@ -19,20 +19,20 @@
       "tab_size": 4,
     },
   },
-  "lsp": {
-    "omnisharp": {
-      "settings": {
-        "FormattingOptions": {
-          "EnableEditorConfigSupport": false,
-          "OrganizeImports": false,
-        },
-        "RoslynExtensionsOptions": {
-          "EnableAnalyzersSupport": false,
-          "EnableImportCompletion": false,
-        },
-      },
-    },
-  },
+  // "lsp": {
+  //   "omnisharp": {
+  //     "settings": {
+  //       "FormattingOptions": {
+  //         "EnableEditorConfigSupport": false,
+  //         "OrganizeImports": false,
+  //       },
+  //       "RoslynExtensionsOptions": {
+  //         "EnableAnalyzersSupport": false,
+  //         "EnableImportCompletion": false,
+  //       },
+  //     },
+  //   },
+  // },
   "base_keymap": "VSCode",
   "theme": "Ayu Mirage",
   "ui_font_size": 14,
