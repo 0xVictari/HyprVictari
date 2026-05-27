@@ -75,8 +75,15 @@ ttf-liberation ttf-dejavu"
 HYPRLAND_AUR="icat"
 
 # --- Fallback: Cinnamon + XLibre (sesion de respaldo) ---
-# XLibre es el X server por defecto en Artix desde 20260402, reemplaza xorg-server.
-# El Xwrapper.config del modulo core esta pensado especificamente para XLibre.
+# XLibre es el X server por defecto en Artix desde 20260402, reemplaza
+# xorg-server. El Xwrapper.config del modulo core esta pensado para XLibre.
+#
+# CRITICO: este modulo DEBE correr ANTES de --hyprland en una instalacion
+# limpia. Si Hyprland se instala primero, trae xorg-xwayland como dep, que
+# arrastra xorg-server-common, y despues XLibre conflictua. Con el orden
+# correcto (XLibre primero), xlibre-xserver-common queda como el 'common'
+# del sistema y xorg-xwayland se acomoda a el via provides/replaces.
+# Referencia: guia oficial de instalacion Artix+dinit+Hyprland con XLibre.
 FALLBACK_PACKAGES="cinnamon \
 xlibre-xserver \
 xlibre-input-libinput \
@@ -147,6 +154,13 @@ check_network() {
 
 pac() { pacman -S --needed --noconfirm "$@"; }
 
+# Variante que acepta automaticamente reemplazos de paquetes en conflicto.
+# Necesaria cuando se instalan paquetes que reemplazan otros (XLibre vs
+# Xorg). --ask=4 = NoDepVersion+IgnoreDep_dependent: pacman responde Y a
+# "Remove xorg-server-common?" cuando un paquete entra en conflicto con
+# uno instalado y hay relacion de provides/replaces.
+pac_replace() { pacman -S --needed --noconfirm --ask=4 "$@"; }
+
 # Correr paru como el usuario real (no root)
 aur() {
     sudo -u "$REAL_USER" paru -S --needed --noconfirm "$@"
@@ -162,13 +176,21 @@ SUDO_DROPIN="/etc/sudoers.d/99-postinstall-temp"
 
 sudo_extend() {
     [[ -f "$SUDO_DROPIN" ]] && return
-    echo "Defaults timestamp_timeout=120" > "$SUDO_DROPIN"
+    # Extender timeout del sudo en curso Y dar NOPASSWD temporal al usuario
+    # real. Sin el NOPASSWD, los 'sudo -u $REAL_USER paru/makepkg' que el
+    # script lanza para builds de AUR crean sesiones sudo nuevas que pediran
+    # password (no heredan el timestamp). Con NOPASSWD durante la corrida,
+    # paru/makepkg no interrumpen para pedir password.
+    cat > "$SUDO_DROPIN" <<EOF
+Defaults timestamp_timeout=120
+${REAL_USER:-anon} ALL=(ALL) NOPASSWD: ALL
+EOF
     chmod 440 "$SUDO_DROPIN"
-    log "Sudo timeout extendido a 120 min mientras dura el script."
+    log "Sudo: timeout extendido + NOPASSWD temporal para ${REAL_USER:-usuario}."
 }
 
 sudo_restore() {
-    [[ -f "$SUDO_DROPIN" ]] && rm -f "$SUDO_DROPIN" && log "Sudo timeout restaurado."
+    [[ -f "$SUDO_DROPIN" ]] && rm -f "$SUDO_DROPIN" && log "Sudo: restaurado (NOPASSWD removido, timeout default)."
 }
 
 # Garantizar restore aunque el script falle o se interrumpa
@@ -397,19 +419,19 @@ DESKTOP
 # =============================================================================
 
 module_fallback() {
-    log "============ MODULO FALLBACK (Cinnamon) ============"
+    log "============ MODULO FALLBACK (Cinnamon + XLibre) ============"
     require_core
     check_network
     confirm "Instalar Cinnamon + XLibre como sesion de respaldo?" || return
 
-    pac $FALLBACK_PACKAGES
-    # El Xwrapper.config ya lo configuro el core (setup_ly) para XLibre.
+    # pac_replace: acepta automaticamente "Remove xorg-server-common?"
+    # cuando xlibre-xserver-common entra como reemplazo. Sin esto, el
+    # script falla en --all si Hyprland (o cualquier xorg-*) ya esta.
+    pac_replace $FALLBACK_PACKAGES
     log "Cinnamon + XLibre instalados."
     log "Disponible como sesion X en el selector de ly."
-    warn "XLibre usa el Xwrapper.config que configuro el core."
-    warn "Si tenias xorg-server instalado de antes, los paquetes xlibre-* lo"
-    warn "  reemplazan automaticamente. Verifica con:"
-    warn "    sudo Xorg -version  (debe decir XLibre, no X.Org)"
+    warn "Verifica que XLibre quedo activo:"
+    warn "  Xorg -version 2>&1 | head -1   (debe decir XLibre, no X.Org)"
 }
 
 # =============================================================================
@@ -601,14 +623,16 @@ PLYCONF
 
 usage() {
     cat <<USAGE
-Uso: sudo $0 [--core|--hyprland|--fallback|--apps|--cosmetics|--all]
+Uso: sudo $0 [--core|--fallback|--hyprland|--apps|--cosmetics|--all]
 
   --core       paru + ly (skin matrix) + sesion base. Correr PRIMERO.
-  --hyprland   Stack Hyprland (requiere core).
   --fallback   Cinnamon + XLibre como respaldo (requiere core).
+               Instalar ANTES de --hyprland para evitar conflictos
+               xlibre-xserver-common vs xorg-server-common.
+  --hyprland   Stack Hyprland (requiere core; idealmente despues de fallback).
   --apps       Apps de usuario + theming (requiere core).
   --cosmetics  Tema de GRUB + Plymouth opcional (requiere core).
-  --all        core -> hyprland -> fallback -> apps -> cosmetics, en orden.
+  --all        core -> fallback -> hyprland -> apps -> cosmetics, en orden.
 
 Dotfiles fuera de scope: traelos a mano. Esto solo instala paquetes.
 USAGE
@@ -616,6 +640,7 @@ USAGE
 
 main() {
     require_root
+    detect_user      # debe correr antes de sudo_extend para tener $REAL_USER
     sudo_extend
     [[ $# -gt 0 ]] || { usage; exit 1; }
 
@@ -626,9 +651,14 @@ main() {
         --apps)     module_apps ;;
         --cosmetics) module_cosmetics ;;
         --all)
+            # ORDEN CRITICO: fallback ANTES de hyprland.
+            # XLibre debe instalarse primero para que xlibre-xserver-common
+            # quede como el 'common' del sistema. Si Hyprland va primero,
+            # trae xorg-xwayland que arrastra xorg-server-common, y despues
+            # XLibre conflictua sin resolucion limpia.
             module_core
-            module_hyprland
             module_fallback
+            module_hyprland
             module_apps
             module_cosmetics
             ;;
