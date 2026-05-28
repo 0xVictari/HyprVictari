@@ -106,7 +106,7 @@ gthumb \
 syncthing \
 yt-dlp \
 btop ripgrep ncdu duf pv \
-unrar unzip rsync wget \
+unrar unzip rsync wget eza \
 fastfetch \
 papirus-icon-theme \
 nwg-look kvantum qt5ct qt6ct \
@@ -117,7 +117,7 @@ stow"
 # --- Apps: paquetes de AUR ---
 # Solo lo que buildea consistentemente en Artix.
 # Si necesitas pix, xplayer, obsidian-bin u otros: paru -S <paquete> a mano.
-APPS_AUR="oh-my-posh-bin \
+APPS_AUR="brave-bin oh-my-posh-bin \
 nemo-fileroller \
 qogir-gtk-theme qogir-icon-theme qogir-cursor-theme \
 zap-git"
