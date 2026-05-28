@@ -42,10 +42,13 @@ CORE_PACKAGES="base-devel git \
 elogind-dinit \
 polkit polkit-gnome \
 pipewire pipewire-pulse pipewire-alsa wireplumber \
+pipewire-dinit pipewire-pulse-dinit wireplumber-dinit \
+pipewire-audio pipewire-session-manager \
+dbus-dinit dbus-dinit-user \
+rtkit \
 gst-plugin-pipewire \
 alsa-utils alsa-plugins alsa-firmware \
 pavucontrol \
-dbus \
 xdg-user-dirs xdg-utils \
 brightnessctl \
 gnome-keyring \
@@ -335,7 +338,9 @@ setup_ly() {
     # Diagnostico aislado experimentalmente: sin Plymouth, ly funciona normal.
     local LY_STARTUP="/etc/ly/startup.sh"
     if [[ -f "$LY_STARTUP" ]]; then
-        if ! grep -q "stty sane" "$LY_STARTUP"; then
+        # Guard especifico: busca el escape RIS, no solo 'stty sane'. Asi una
+        # version vieja del fix (con tput reset) SI se actualiza a la nueva.
+        if ! grep -q '033c' "$LY_STARTUP"; then
             backup "$LY_STARTUP"
             cat > "$LY_STARTUP" <<'STARTUP_EOF'
 #!/bin/sh
@@ -345,10 +350,16 @@ setup_ly() {
 # Plymouth deja el VT con line discipline / atributos en estado inconsistente,
 # causando que ly no renderice asteriscos en el prompt de password ni avance
 # el cursor (workaround conocido: Ctrl+C). Este reset normaliza el terminal
-# antes de que ly tome control.
-if [ "$TERM" = "linux" ]; then
+# antes de que ly tome control. Se usa el escape sequence crudo (\033c, full
+# reset RIS) ademas de stty, porque tput reset depende de terminfo y puede
+# no estar disponible/correcto tan temprano en el boot.
+if [ "$TERM" = "linux" ] || [ -z "$TERM" ]; then
+    # RIS (Reset to Initial State) - escape sequence crudo, no depende de tput
+    printf '\033c' > /dev/console 2>/dev/null
+    printf '\033c' 2>/dev/null
+    # stty sane sobre el TTY de la consola
     /usr/bin/stty sane 2>/dev/null
-    /usr/bin/tput reset 2>/dev/null
+    /usr/bin/stty sane < /dev/console 2>/dev/null
 fi
 STARTUP_EOF
             chmod +x "$LY_STARTUP"
@@ -371,12 +382,40 @@ module_core() {
     install_paru
     setup_ly
 
-    # Servicios dinit del core
+    # --- Servicios dinit del core (system level) ---
     ln -sf /etc/dinit.d/dbus /etc/dinit.d/boot.d/dbus 2>/dev/null || true
+    # dinit-user-spawn: CRITICO. Arranca los user services de cada usuario al
+    # login. pipewire/wireplumber corren como USER services, no system. Sin
+    # esto, pipewire nunca arranca en la sesion -> waybar no conecta al stream
+    # de audio, apps sin sonido. La ISO oficial de Artix lo tiene en boot.d.
+    if [[ -e /lib/dinit.d/dinit-user-spawn ]]; then
+        ln -sf /lib/dinit.d/dinit-user-spawn /etc/dinit.d/boot.d/dinit-user-spawn 2>/dev/null || true
+    elif [[ -e /usr/lib/dinit.d/dinit-user-spawn ]]; then
+        ln -sf /usr/lib/dinit.d/dinit-user-spawn /etc/dinit.d/boot.d/dinit-user-spawn 2>/dev/null || true
+    fi
+    log "dinit-user-spawn habilitado (necesario para pipewire user service)."
+
+    # --- User services de audio (pipewire/wireplumber/pulse + dbus) ---
+    # Replicamos EXACTAMENTE lo que hace la ISO oficial de Artix: crear
+    # symlinks en ~/.config/dinit.d/boot.d/ apuntando a /etc/dinit.d/user/.
+    # Asi dinit-user-spawn (habilitado arriba) los arranca al login.
+    # Los service files vienen de los paquetes *-dinit en /etc/dinit.d/user/.
+    # Verificado contra instalacion Calamares: estos 4 son los que habilita.
+    sudo -u "$REAL_USER" sh -c '
+        mkdir -p "$HOME/.config/dinit.d/boot.d"
+        for svc in dbus pipewire wireplumber pipewire-pulse; do
+            if [ -e "/etc/dinit.d/user/$svc" ]; then
+                ln -sf "/etc/dinit.d/user/$svc" "$HOME/.config/dinit.d/boot.d/$svc"
+            fi
+        done
+    '
+    log "User services de audio habilitados (dbus, pipewire, wireplumber, pipewire-pulse)."
 
     # Marcar que el core corrio
     touch /var/lib/.artix-post-core-done
     log "Core completado."
+    warn "Los user services de audio arrancan al PROXIMO login (o reboot)."
+    warn "Verifica tras reloguear: dinitctl --user list | grep pipewire"
 }
 
 require_core() {
