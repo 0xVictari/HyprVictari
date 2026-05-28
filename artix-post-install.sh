@@ -45,6 +45,7 @@ pipewire pipewire-pulse pipewire-alsa wireplumber \
 pipewire-dinit pipewire-pulse-dinit wireplumber-dinit \
 pipewire-audio pipewire-session-manager \
 dbus-dinit dbus-dinit-user \
+dinit-user-spawn \
 rtkit \
 gst-plugin-pipewire \
 alsa-utils alsa-plugins alsa-firmware \
@@ -386,14 +387,16 @@ module_core() {
     ln -sf /etc/dinit.d/dbus /etc/dinit.d/boot.d/dbus 2>/dev/null || true
     # dinit-user-spawn: CRITICO. Arranca los user services de cada usuario al
     # login. pipewire/wireplumber corren como USER services, no system. Sin
-    # esto, pipewire nunca arranca en la sesion -> waybar no conecta al stream
-    # de audio, apps sin sonido. La ISO oficial de Artix lo tiene en boot.d.
+    # esto, pipewire nunca arranca -> waybar no conecta al stream de audio.
+    # El PAQUETE dinit-user-spawn (en CORE_PACKAGES) habilita su propio
+    # symlink en boot.d via post-install hook, asi que normalmente no hace
+    # falta el ln manual. Lo dejamos como red de seguridad idempotente.
     if [[ -e /lib/dinit.d/dinit-user-spawn ]]; then
         ln -sf /lib/dinit.d/dinit-user-spawn /etc/dinit.d/boot.d/dinit-user-spawn 2>/dev/null || true
     elif [[ -e /usr/lib/dinit.d/dinit-user-spawn ]]; then
         ln -sf /usr/lib/dinit.d/dinit-user-spawn /etc/dinit.d/boot.d/dinit-user-spawn 2>/dev/null || true
     fi
-    log "dinit-user-spawn habilitado (necesario para pipewire user service)."
+    log "dinit-user-spawn presente (arranca user services como pipewire)."
 
     # --- User services de audio (pipewire/wireplumber/pulse + dbus) ---
     # Replicamos EXACTAMENTE lo que hace la ISO oficial de Artix: crear
