@@ -43,7 +43,6 @@
     "calendar": {
       "mode": "month",
       "mode-mon-col": 3,
-      "on-click-right": "mode",
       "format": {
         "months": "<span color='#f5e0dc'><b>{}</b></span>",
         "weekdays": "<span color='#f9e2af'><b>{}</b></span>",
@@ -52,11 +51,9 @@
     },
     "actions": { "on-click-right": "mode" },
     "min-length": 8,
-    "max-length": 28,
   },
   "hyprland/workspaces": {
     "format": "{icon}",
-    "separate-outputs": false,
     "disable-scroll": false,
     "all-outputs": true,
     "on-click": "activate",
@@ -84,19 +81,20 @@
   "network": {
     "format": "{ifname}",
     "format-wifi": "{essid} ({signalStrength}%) ",
-    "format-ethernet": " 󰈀 ({bandwidthDownBytes}↓/{bandwidthUpBytes}↑)",
+    "format-ethernet": " 󰈀 ({bandwidthDownBytes:>}↓{bandwidthUpBytes:>}↑)",
     "format-disconnected": "", //An empty format will hide the module.
     "tooltip-format": "{ifname} via {gwaddr} 󰊗",
     "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
     "tooltip-format-ethernet": "{ifname} \uf0c1 ({ipaddr}/{cidr})",
     "tooltip-format-disconnected": "Disconnected",
     "interval": 1, // Update every second for real-time monitoring
-    "max-length": 50,
   },
   "temperature": {
     "format": "{icon} {temperatureC}°C ",
     "tooltip-format": "CPU",
-    "hwmon-path": "/sys/class/hwmon/hwmon4/temp1_input",
+    // Ruta PCI fija (k10temp): el numero de hwmonN cambia entre arranques
+    "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:18.3/hwmon",
+    "input-filename": "temp1_input",
     "critical-threshold": 80,
     "format-critical": " {temperatureC}°C", // Warning when hot
     "format-icons": ["", "", ""],
@@ -104,7 +102,9 @@
   },
   "temperature#2": {
     "format": "{icon} {temperatureC}°C ",
-    "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
+    // Ruta PCI fija (amdgpu)
+    "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:01.1/0000:01:00.0/0000:02:00.0/0000:03:00.0/hwmon",
+    "input-filename": "temp1_input",
     "tooltip-format": "GPU",
     "critical-threshold": 80,
     "format-critical": " {temperatureC}°C",
@@ -113,11 +113,11 @@
   },
   "memory": {
     "format": "󰫗 {}% ",
-    "tooltip": "false",
+    "tooltip": false,
   },
   "cpu": {
     "format": " {usage}% ",
-    "tooltip": "false",
+    "tooltip": false,
   },
   "pulseaudio": {
     "format": " {volume}%",
@@ -141,6 +141,7 @@
   "custom/cava": {
     "format": "{}",
     "exec": "~/.config/hypr/Scripts/cava.sh",
+    "restart-interval": 5, // al iniciar sesion PipeWire puede no estar listo y cava sale
   },
   // "custom/pww": {
   //   "format": "{}",
@@ -182,7 +183,7 @@
     "return-type": "json",
     "interval": 2,
     "exec": "~/.config/hypr/Scripts/gaming-mode-status.sh",
-    "on-click": "~/.config/hypr/Scripts/gaming-mode-toggle.sh && pkill -RTMIN+8 waybar",
+    "on-click": "~/.config/hypr/Scripts/gaming-mode-toggle.sh",
     "signal": 8,
   },
 }

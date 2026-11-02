@@ -1,19 +1,17 @@
-#! /bin/sh
+#!/bin/bash
+# Visualizador para el modulo custom/cava de Waybar.
+# Un solo "cava | sed": si Waybar muere (killall waybar) sed y cava reciben SIGPIPE y
+# terminan solos. Si cava sale al iniciar sesion (PipeWire todavia no esta),
+# Waybar lo relanza por "restart-interval".
 
-bar="▁▂▃▄▅▆▇█"
+bars=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
 dict="s/;//g;"
-
-# creating "dictionary" to replace char with bar
-i=0
-while [ $i -lt ${#bar} ]
-do
-    dict="${dict}s/$i/${bar:$i:1}/g;"
-    i=$((i=i+1))
+for i in "${!bars[@]}"; do
+    dict+="s/$i/${bars[i]}/g;"
 done
 
-# write cava config
-config_file="/tmp/polybar_cava_config"
-echo "
+config_file="${XDG_RUNTIME_DIR:-/tmp}/waybar-cava.conf"
+cat > "$config_file" <<EOF
 [general]
 bars = 18
 
@@ -22,9 +20,6 @@ method = raw
 raw_target = /dev/stdout
 data_format = ascii
 ascii_max_range = 7
-" > $config_file
+EOF
 
-# read stdout from cava
-cava -p $config_file | while read -r line; do
-    echo $line | sed $dict
-done
+cava -p "$config_file" | sed -u "$dict"

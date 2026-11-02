@@ -98,12 +98,10 @@ window#waybar.hidden {
 #pulseaudio,
 #custom-launcher,
 #custom-powermenu,
-#custom-music-player,
 #cpu,
 #tray,
 #memory,
 #window,
-#custom-screen-recorder,
 #temperature {
     min-height: 0;
     padding: 2px 10px;
@@ -112,25 +110,9 @@ window#waybar.hidden {
     background-color: #181825;
 }
 
-#custom-sep {
+#custom-separator {
     padding: 0px;
     color: #585b70;
-}
-
-#custom-screen-recorder.recording {
-    color: #10ef2c;
-}
-
-#custom-screen-recorder.not-recording {
-    color: #df2020;
-}
-
-#custom-music-player.playing {
-    color: #cdd6f4;
-}
-
-#custom-music-player.paused {
-    color: #9399b2;
 }
 
 window#waybar.empty #window {
@@ -138,12 +120,6 @@ window#waybar.empty #window {
 }
 
 #cpu {
-    color: #94e2d5;
-    margin-left: 0;
-    margin-right: 0;
-}
-
-#custom-gpu {
     color: #94e2d5;
     margin-left: 0;
     margin-right: 0;
@@ -158,10 +134,6 @@ window#waybar.empty #window {
     color: #74c7ec;
 }
 
-#clock.simpleclock {
-    color: #89b4fa;
-}
-
 #window {
     color: #a6e3a1;
 }
@@ -172,10 +144,6 @@ window#waybar.empty #window {
 
 #pulseaudio.muted {
     color: #a6adc8;
-}
-
-#custom-logo {
-    color: #89b4fa;
 }
 
 #custom-powermenu {
@@ -193,7 +161,8 @@ tooltip {
     color: white;
 }
 
-#custom-launcher button {
+/* Los modulos custom son box > label: no hay "button" que seleccionar */
+#custom-launcher {
     font-size: 18px;
     margin-left: 4px;
     padding-left: 4px;
@@ -204,45 +173,20 @@ tooltip {
     background: transparent;
 }
 
-#custom-launcher button:hover {
-    box-shadow: inherit;
-    text-shadow: inherit;
+#custom-launcher:hover {
     color: #1e1e2e;
     background-color: #cdd6f4;
 }
 
-/* Animations - Place at the end */
-/*@keyframes gaming-pulse {
-    0%,
-    100% {
+/* Animations - Place at the end. GTK no acepta "0%, 100%" en un mismo bloque */
+@keyframes gaming-pulse {
+    0% {
         opacity: 1;
     }
     50% {
         opacity: 0.7;
     }
-}
-
-@keyframes blink {
-    0% {
-        background-color: transparent;
-        color: inherit;
-    }
     100% {
-        background-color: #f38ba8;
-        color: #181825;
+        opacity: 1;
     }
-}*/
-
-/* #cava {
-    color: @mauve;
-    border-radius: 6px;
-    padding: 0px 10px;
-    margin: 6px 2px;
-} */
-
-/* #custom-logo {
-    background-image: url("/usr/share/logo.png");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-} */
+}
