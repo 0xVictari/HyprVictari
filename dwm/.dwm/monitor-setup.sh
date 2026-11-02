@@ -11,3 +11,6 @@ else
     xrandr --output eDP-1 --mode 1280x720 --auto
     xrandr --output HDMI-1 --off
 fi
+
+# Refrescar el wallpaper para la nueva geometría
+feh --bg-scale ~/Pictures/background

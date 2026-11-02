@@ -64,11 +64,20 @@ static const char unknown_str[] = "n/a";
  * wifi_perc           WiFi signal in percent          interface name (wlan0)
  */
  static const struct arg args[] = {
-	/* function format          argument */
-	{ run_command, " : %4s | ", "amixer sget Master | awk -F\"[][]\" '/%/ { print $2 }' | head -n1" },
-	{datetime,  "^c#84cc16^󰸗 %s^d^",            "%I:%M:%S %p"},
-	{ wifi_perc, "[ %s] ",         "wlp1s0"},
-	{ cpu_perc,  " ^c#06b6d4^ %s%%^d^ ", NULL	      },
-	{ ram_perc, "^c#a855f7^󰫗 %s%%^d^ ", NULL	      },
-     { battery_perc, "^c#f43f5e^ %s%%^d^", "BAT0" },
+	/* function       format                          argument */
+	/* micrófono: solo aparece (en rojo) cuando está ABIERTO */
+	{ run_command,    "^c#ef4444^%s^d^",               "wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED && echo || echo '󰍬 '" },
+	/* volumen: ícono distinto si está en mute (wpctl, igual que las teclas de dwm) */
+	{ run_command,    "^c#f59e0b^%s^d^  ",             "wpctl get-volume @DEFAULT_AUDIO_SINK@ | LC_ALL=C awk '{printf \"%s %d%%\", ($3==\"[MUTED]\" ? \"󰝟\" : \"󰕾\"), $2*100}'" },
+	{ datetime,       "^c#84cc16^󰸗 %s^d^  ",           "%I:%M:%S %p" },
+	/* SSID cortado a 14 caracteres + banda calculada de la frecuencia */
+	{ wifi_essid,     "^c#3b82f6^ %.14s ",            "wlp1s0" },
+	{ run_command,    "%s ",                           "iwgetid wlp1s0 -f -r | LC_ALL=C awk '{f=$1/1e9; print (f>=5.9 ? \"6G\" : (f>=4.9 ? \"5G\" : \"2.4G\"))}'" },
+	{ wifi_perc,      "%s%%^d^  ",                     "wlp1s0" },
+	{ cpu_perc,       "^c#06b6d4^ %s%%^d^ ",          NULL },
+	/* zona x86_pkg_temp; si muestra n/a tras un update de kernel, buscarla de nuevo */
+	{ temp,           "^c#06b6d4^%s°^d^  ",            "/sys/class/thermal/thermal_zone16/temp" },
+	{ ram_perc,       "^c#a855f7^󰫗 %s%%^d^  ",         NULL },
+	{ battery_state,  "^c#f43f5e^ %s ",               "BAT0" },
+	{ battery_perc,   "%s%%^d^",                       "BAT0" },
  };

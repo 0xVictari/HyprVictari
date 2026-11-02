@@ -143,10 +143,13 @@ static char *tagicons[][NUMTAGS] =
 /* Scratchpads: terminales flotantes que se muestran/ocultan con una tecla */
 const char *spcmd1[] = { "kitty", "--name", "spterm", NULL };
 const char *spcmd2[] = { "kitty", "--name", "spbtop", "-e", "btop", NULL };
+/* lazydocker viene de mise: ruta al shim porque dwm no tiene el PATH de zsh */
+const char *spcmd3[] = { "kitty", "--name", "spdocker", "-e", "/home/fcasse/.local/share/mise/shims/lazydocker", NULL };
 static Sp scratchpads[] = {
    /* name          cmd  */
    {"spterm",      spcmd1},
    {"spbtop",      spcmd2},
+   {"spdocker",    spcmd3},
 };
 
 /* Clientes que van al primer tag vacío: en HDMI (sin usar el tag 1) o,
@@ -166,6 +169,7 @@ static const Rule rules[] = {
 	RULE(.wintype = WTYPE "SPLASH", .isfloating = 1)
 	RULE(.instance = "spterm", .tags = SPTAG(0), .isfloating = 1)
 	RULE(.instance = "spbtop", .tags = SPTAG(1), .isfloating = 1)
+	RULE(.instance = "spdocker", .tags = SPTAG(2), .isfloating = 1)
 	RULE(.class = "slack", .tags = 1 << 1, .monitor = 0)      /* tag 2, eDP-1 */
 	RULE(.class = "TelegramDesktop", .tags = 1 << 2)           /* tag 3 */
 	RULE(.class = "Gimp", .tags = 1 << 4)
@@ -290,6 +294,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_n,          togglealttag,           {0} },
 	{ MODKEY,                       XK_s,          togglescratch,          {.ui = 0 } },  /* terminal flotante */
 	{ MODKEY,                       XK_a,          togglescratch,          {.ui = 1 } },  /* btop flotante */
+	{ MODKEY|ShiftMask,             XK_d,          togglescratch,          {.ui = 2 } },  /* lazydocker flotante */
 	{ MODKEY|ShiftMask,             XK_f,          togglefakefullscreen,   {0} },
 	{ MODKEY|ShiftMask,             XK_t,          togglesticky,           {0} },         /* visible en todos los tags */
 	{ MODKEY,                       XK_Left,       focusdir,               {.i = 0 } },
