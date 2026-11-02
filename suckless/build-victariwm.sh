@@ -32,7 +32,7 @@ mv "$tmp/out/config.h" "$tmp/out/config.def.h"
 # Cambios propios sobre el código finalizado (no existen como patch de flexipatch)
 for d in victariwm-src/local/*.diff; do
   [[ -e $d ]] || continue
-  patch -s -d "$tmp/out" -p1 < "$d" || { echo "No aplica: $d (regenerarlo sobre el código nuevo)"; exit 1; }
+  patch -s --no-backup-if-mismatch -d "$tmp/out" -p1 < "$d" || { echo "No aplica: $d (regenerarlo sobre el código nuevo)"; exit 1; }
 done
 rsync -a --delete --exclude config.h "$tmp/out/" "$OUT/"
 

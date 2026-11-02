@@ -84,6 +84,9 @@
 /* Show layout symbol in bar */
 #define BAR_LTSYMBOL_PATCH 1
 
+/* Adds a colour schme for the layout symbol */
+#define BAR_LTSYMBOL_SCHEME_PATCH 0
+
 /* Adds powerline arrows for the status.
  * This uses statuscolors logic for choosing colors for the powerline. As these markers
  * are also control characters there is no explicit statuscmd support for this patch.
@@ -205,6 +208,9 @@
  */
 #define BAR_WINICON_PATCH 0
 
+/* Addon for the winicon patch - do not display window title if icon exists */
+#define BAR_WINICON_NOTITLE_PATCH 0
+
 /* Show window title in bar */
 #define BAR_WINTITLE_PATCH 1
 
@@ -289,6 +295,12 @@
  * https://codemadness.org/paste/dwm-border-bar.patch
  */
 #define BAR_BORDER_PATCH 0
+
+/* Optional addon for the border patch. This makes it so that the bar border is drawn using
+ * the background colour of the bar as opposed to the border colour. This allows for the
+ * border to have the same transparency as the background thus giving a more uniform look.
+ */
+#define BAR_BORDER_COLBG_PATCH 0
 
 /* This patch centers the WM_NAME of the currently selected window on the status bar.
  * This is compatible with the wintitle, bartabgroups, flexwintitle and awesomebar bar
@@ -513,6 +525,19 @@
  */
 #define AUTORESIZE_PATCH 0
 
+/* This patch allows for the mouse cursor to automatically hide when the user uses the keyboard.
+ *
+ * You need to uncomment the corresponding lines in config.mk to use additional libraries
+ * when including this patch.
+ *
+ * This patch depends on the following libraries:
+ *    - libxfixes
+ *    - libxi
+ *
+ * https://github.com/bakkeby/patches/wiki/banish
+ */
+#define BANISH_PATCH 0
+
 /* This patch adds proper support for Right-To-Left languages. (such as Farsi, Arabic or Hebrew).
  *
  * You need to uncomment the corresponding lines in config.mk to use the -lfribidi library
@@ -618,6 +643,10 @@
  * cfact to adjust the client's size in the stack. This patch depends on the cfacts patch.
  */
 #define DRAGCFACT_PATCH 0
+
+/* Patch that combines dragfact and dragmfact.
+ */
+#define DRAGFACT_PATCH 0
 
 /* This patch lets you resize the split in the tile layout (i.e. modify mfact) by holding
  * the modkey and dragging the mouse.
@@ -736,6 +765,18 @@
  */
 #define FULLSCREEN_PATCH 0
 
+/* Adds a rule identifying clients as a "game" such that if the client is in fullscreen and it
+ * loses focus (e.g. by moving to another tag) then it will automatically be minimized (set to
+ * IconicState and unmapped).
+ *
+ * When the client receives focus again (e.g. by going back to its tag) then it will
+ * automatically be unminimized (set to NormalState and mapped). This should address many of the
+ * black screen or window is tiny issues after having moved to another tag and back again.
+ *
+ * https://github.com/bakkeby/patches/wiki/steam
+ */
+#define GAMES_PATCH 0
+
 /* This patch provides a keybinding to rotate all clients in the currently selected
  * area (master or stack) without affecting the other area.
  * https://dwm.suckless.org/patches/inplacerotate/
@@ -821,6 +862,11 @@
  * https://dwm.suckless.org/patches/monoclesymbol/
  */
 #define MONOCLESYMBOL_PATCH 0
+
+/* This patch provides a keybinding to center the focused window.
+ * https://dwm.suckless.org/patches/movecenter/
+ */
+#define MOVECENTER_PATCH 1
 
 /* Makes a window floating and 1/3rd the height and 1/3rd the width of the screen and is
  * positioned in either the center or one of the 8 cardinal directions depending on which

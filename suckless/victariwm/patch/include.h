@@ -16,6 +16,7 @@
 #include "autostart.h"
 #include "fakefullscreenclient.h"
 #include "focusdir.h"
+#include "movecenter.h"
 #include "movestack.h"
 #include "pertag.h"
 #include "restartsig.h"

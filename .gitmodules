@@ -4,3 +4,6 @@
 [submodule "suckless/flexipatch-finalizer"]
 	path = suckless/flexipatch-finalizer
 	url = https://github.com/bakkeby/flexipatch-finalizer.git
+[submodule "suckless/slstatus"]
+	path = suckless/slstatus
+	url = https://git.suckless.org/slstatus

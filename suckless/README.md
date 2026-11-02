@@ -37,6 +37,7 @@
 | `Super+Shift+Space` | alternar flotante |
 | `Super+Shift+f` | fullscreen confinado a la ventana (fake fullscreen) |
 | `Super+Shift+t` | sticky: visible en todos los tags |
+| `Super+g` | centrar ventana flotante |
 
 ## Layout
 
@@ -92,5 +93,5 @@ Volumen ±5 % y mute (`wpctl`), mute de micrófono, brillo ±5 %.
 
 ```bash
 ./build-victariwm.sh --install          # dwm (patches en victariwm-src/patches.h)
-sudo make -C slstatus install && pkill -x slstatus; setsid slstatus >/dev/null 2>&1 &
+./build-slstatus.sh --install          # slstatus (config en slstatus-src/config.h)
 ```

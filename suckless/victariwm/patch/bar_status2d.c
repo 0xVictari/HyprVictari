@@ -1,9 +1,7 @@
 int
 width_status2d(Bar *bar, BarArg *a)
 {
-	int width;
-	width = status2dtextlength(stext);
-	return width ? width + lrpad : 0;
+	return status2dtextlength(stext);
 }
 
 int
@@ -35,7 +33,6 @@ drawstatusbar(BarArg *a, char* stext)
 	memcpy(text, stext, len);
 	text[len] = '\0';
 
-	x += lrpad / 2;
 	drw_setscheme(drw, scheme[LENGTH(colors)]);
 	drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
 	drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
@@ -167,4 +164,3 @@ status2dtextlength(char* stext)
 	free(p);
 	return w;
 }
-

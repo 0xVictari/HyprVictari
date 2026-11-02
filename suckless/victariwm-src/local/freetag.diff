@@ -1,6 +1,6 @@
 --- a/dwm.c
 +++ b/dwm.c
-@@ -414,6 +414,29 @@
+@@ -415,6 +415,29 @@
  struct NumTags { char limitexceeded[NUMTAGS > 31 ? -1 : 1]; };
  
  /* function implementations */
@@ -30,7 +30,7 @@
  void
  applyrules(Client *c)
  {
-@@ -451,6 +474,13 @@
+@@ -452,6 +475,13 @@
  
  		}
  	}
