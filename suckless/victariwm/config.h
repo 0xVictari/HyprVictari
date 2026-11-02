@@ -143,8 +143,9 @@ static char *tagicons[][NUMTAGS] =
 /* Scratchpads: terminales flotantes que se muestran/ocultan con una tecla */
 const char *spcmd1[] = { "kitty", "--name", "spterm", NULL };
 const char *spcmd2[] = { "kitty", "--name", "spbtop", "-e", "btop", NULL };
-/* lazydocker viene de mise: ruta al shim porque dwm no tiene el PATH de zsh */
-const char *spcmd3[] = { "kitty", "--name", "spdocker", "-e", "/home/fcasse/.local/share/mise/shims/lazydocker", NULL };
+/* lazydocker viene de mise: ruta al shim porque dwm no tiene el PATH de zsh.
+ * Vía sh para expandir $HOME (sirve con cualquier usuario). */
+const char *spcmd3[] = { "kitty", "--name", "spdocker", "-e", "sh", "-c", "exec \"$HOME/.local/share/mise/shims/lazydocker\"", NULL };
 static Sp scratchpads[] = {
    /* name          cmd  */
    {"spterm",      spcmd1},

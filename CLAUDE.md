@@ -102,7 +102,7 @@ Do not put loose files (READMEs, notes) inside stow packages like `dwm/` or `sxh
 
 Enabled patches (besides bar modules, autostart, pertag, vanitygaps, restartsig, seamless_restart, movestack): scratchpads, fakefullscreen_client, shiftview_clients, sticky, focusdir, tagallmon, sendmon_center, alwayscenter, movecenter. Layouts: tile, monocle, fibonacci dwindle. Full key list in `suckless/README.md`.
 
-Rules (`config.h`): Slack → tag 2 on monitor 0 (eDP-1); Telegram → tag 3; Gimp → tag 5; scratchpads `spterm` (kitty), `spbtop`, `spdocker` (lazydocker via the absolute mise shim path, since dwm lacks the zsh PATH).
+Rules (`config.h`): Slack → tag 2 on monitor 0 (eDP-1); Telegram → tag 3; Gimp → tag 5; scratchpads `spterm` (kitty), `spbtop`, `spdocker` (lazydocker via the mise shim at `$HOME/.local/share/mise/shims`, run through `sh -c` so no username is hardcoded; dwm lacks the zsh PATH).
 
 `freetag.diff` + `freetagclasses[] = { "Wfica" }` in `config.h`: Citrix's main window (non-floating) goes to the first empty tag of the largest monitor (HDMI), skipping tag 1 when there are 2+ monitors; with only the laptop, the first empty tag. It does not switch the view (user preference).
 
