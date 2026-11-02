@@ -1,0 +1,13 @@
+[Unit]
+Description=Normaliza el clipboard de Zed para Citrix (xclip)
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/.local/bin/clip-normalize
+Environment=DISPLAY=:0
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

@@ -23,3 +23,6 @@ slstatus &
 xautolock -time 15 -locker "cinnamon-screensaver-command -l" \
  -killtime 30 -killer "systemctl suspend" &
 picom -b &
+
+# Clipboard Zed -> Citrix (paquete stow clipboard/). dwm no activa graphical-session.target
+systemctl --user start clip-normalize
