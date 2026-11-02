@@ -58,12 +58,15 @@
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask) & (ShiftMask|ControlMask|Mod1Mask|Mod2Mask|Mod3Mask|Mod4Mask|Mod5Mask))
 #define INTERSECT(x,y,w,h,m)    (MAX(0, MIN((x)+(w),(m)->wx+(m)->ww) - MAX((x),(m)->wx)) \
                                * MAX(0, MIN((y)+(h),(m)->wy+(m)->wh) - MAX((y),(m)->wy)))
-#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]))
+#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]) || C->issticky)
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define WTYPE                   "_NET_WM_WINDOW_TYPE_"
-#define TAGMASK                 ((1 << NUMTAGS) - 1)
+#define TOTALTAGS               (NUMTAGS + LENGTH(scratchpads))
+#define TAGMASK                 ((1 << TOTALTAGS) - 1)
+#define SPTAG(i)                ((1 << NUMTAGS) << (i))
+#define SPTAGMASK               (((1 << LENGTH(scratchpads))-1) << NUMTAGS)
 #define TEXTWM(X)               (drw_fontset_getwidth(drw, (X), True) + lrpad)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X), False) + lrpad)
 #define HIDDEN(C)               ((getstate(C->win) == IconicState))
@@ -197,6 +200,8 @@ struct Client {
 	int bw, oldbw;
 	unsigned int tags;
 	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen;
+	int fakefullscreen;
+	int issticky;
 	Client *next;
 	Client *snext;
 	Monitor *mon;
@@ -409,6 +414,29 @@ static Window root, wmcheckwin;
 struct NumTags { char limitexceeded[NUMTAGS > 31 ? -1 : 1]; };
 
 /* function implementations */
+/* local: freetag. Ubica el cliente en el primer tag vacío del monitor más grande
+ * (HDMI). Con más de un monitor el tag 1 queda reservado; con uno solo se usa
+ * cualquier tag vacío. Si no hay ninguno libre, aplica el comportamiento normal. */
+static void
+placefreetag(Client *c)
+{
+	Monitor *m, *target = mons;
+	Client *t;
+	unsigned int i, used = 0;
+
+	for (m = mons->next; m; m = m->next)
+		if (m->mw * m->mh > target->mw * target->mh)
+			target = m;
+	for (t = target->clients; t; t = t->next)
+		used |= t->tags;
+	for (i = mons->next ? 1 : 0; i < NUMTAGS; i++)
+		if (!(used & (1 << i))) {
+			c->mon = target;
+			c->tags = 1 << i;
+			return;
+		}
+}
+
 void
 applyrules(Client *c)
 {
@@ -436,17 +464,28 @@ applyrules(Client *c)
 		{
 			c->isfloating = r->isfloating;
 			c->tags |= r->tags;
+			if ((r->tags & SPTAGMASK) && r->isfloating) {
+				c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
+				c->y = c->mon->wy + (c->mon->wh / 2 - HEIGHT(c) / 2);
+			}
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
 				c->mon = m;
 
 		}
 	}
+	/* local: freetag (solo ventanas principales; los diálogos flotan) */
+	if (!c->isfloating)
+		for (i = 0; i < LENGTH(freetagclasses); i++)
+			if (strstr(class, freetagclasses[i])) {
+				placefreetag(c);
+				break;
+			}
 	if (ch.res_class)
 		XFree(ch.res_class);
 	if (ch.res_name)
 		XFree(ch.res_name);
-	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : c->mon->tagset[c->mon->seltags];
+	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : (c->mon->tagset[c->mon->seltags] & ~SPTAGMASK);
 }
 
 int
@@ -744,6 +783,8 @@ clientmessage(XEvent *e)
 	if (cme->message_type == netatom[NetWMState]) {
 		if (cme->data.l[1] == netatom[NetWMFullscreen]
 		|| cme->data.l[2] == netatom[NetWMFullscreen]) {
+			if (c->fakefullscreen == 2 && c->isfullscreen)
+				c->fakefullscreen = 3;
 			setfullscreen(c, (cme->data.l[0] == 1 /* _NET_WM_STATE_ADD    */
 				|| (cme->data.l[0] == 2 /* _NET_WM_STATE_TOGGLE */
 				&& !c->isfullscreen
@@ -793,7 +834,7 @@ configurenotify(XEvent *e)
 			updatebars();
 			for (m = mons; m; m = m->next) {
 				for (c = m->clients; c; c = c->next)
-					if (c->isfullscreen)
+					if (c->isfullscreen && c->fakefullscreen != 1)
 						resizeclient(c, m->mx, m->my, m->mw, m->mh);
 				for (bar = m->bar; bar; bar = bar->next)
 					XMoveResizeWindow(dpy, bar->win, bar->bx, bar->by, bar->bw, bar->bh);
@@ -1160,6 +1201,8 @@ void
 focus(Client *c)
 {
 	if (!c || !ISVISIBLE(c))
+		for (c = selmon->stack; c && (!ISVISIBLE(c) || c->issticky); c = c->snext);
+	if (!c || !ISVISIBLE(c))
 		for (c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
 	if (selmon->sel && selmon->sel != c)
 		unfocus(selmon->sel, 0, c);
@@ -1214,7 +1257,7 @@ focusstack(const Arg *arg)
 {
 	Client *c = NULL, *i;
 
-	if (!selmon->sel || (selmon->sel->isfullscreen && lockfullscreen))
+	if (!selmon->sel || (selmon->sel->isfullscreen && !selmon->sel->fakefullscreen))
 		return;
 	if (arg->i > 0) {
 		for (c = selmon->sel->next; c && !ISVISIBLE(c); c = c->next);
@@ -1556,7 +1599,7 @@ movemouse(const Arg *arg)
 
 	if (!(c = selmon->sel))
 		return;
-	if (c->isfullscreen) /* no support moving fullscreen windows by mouse */
+	if (c->isfullscreen && c->fakefullscreen != 1) /* no support moving fullscreen windows by mouse */
 		return;
 	restack(selmon);
 	nx = ocx = c->x;
@@ -1603,6 +1646,10 @@ movemouse(const Arg *arg)
 
 	XUngrabPointer(dpy, CurrentTime);
 	if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
+		if (c->tags & SPTAGMASK) {
+			c->mon->tagset[c->mon->seltags] ^= (c->tags & SPTAGMASK);
+			m->tagset[m->seltags] |= (c->tags & SPTAGMASK);
+		}
 		sendmon(c, m);
 		selmon = m;
 		focus(NULL);
@@ -1726,7 +1773,7 @@ resizemouse(const Arg *arg)
 
 	if (!(c = selmon->sel))
 		return;
-	if (c->isfullscreen) /* no support resizing fullscreen windows by mouse */
+	if (c->isfullscreen && c->fakefullscreen != 1) /* no support resizing fullscreen windows by mouse */
 		return;
 	restack(selmon);
 	nx = ocx = c->x;
@@ -1772,6 +1819,10 @@ resizemouse(const Arg *arg)
 	XUngrabPointer(dpy, CurrentTime);
 	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 	if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
+		if (c->tags & SPTAGMASK) {
+			c->mon->tagset[c->mon->seltags] ^= (c->tags & SPTAGMASK);
+			m->tagset[m->seltags] |= (c->tags & SPTAGMASK);
+		}
 		sendmon(c, m);
 		selmon = m;
 		focus(NULL);
@@ -1870,7 +1921,10 @@ sendmon(Client *c, Monitor *m)
 	detach(c);
 	detachstack(c);
 	c->mon = m;
+	if (!(c->tags & SPTAGMASK))
 	c->tags = m->tagset[m->seltags]; /* assign tags of target monitor */
+	c->x = m->mx + (m->mw - WIDTH(c)) / 2;
+	c->y = m->my + (m->mh - HEIGHT(c)) / 2;
 	attach(c);
 	attachstack(c);
 	arrange(NULL);
@@ -1937,29 +1991,71 @@ setfocus(Client *c)
 void
 setfullscreen(Client *c, int fullscreen)
 {
-	if (fullscreen && !c->isfullscreen) {
-		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-			PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
+	XEvent ev;
+	int savestate = 0, restorestate = 0;
+
+	if ((c->fakefullscreen == 0 && fullscreen && !c->isfullscreen) // normal fullscreen
+			|| (c->fakefullscreen == 2 && fullscreen)) // fake fullscreen --> actual fullscreen
+		savestate = 1; // go actual fullscreen
+	else if ((c->fakefullscreen == 0 && !fullscreen && c->isfullscreen) // normal fullscreen exit
+			|| (c->fakefullscreen >= 2 && !fullscreen)) // fullscreen exit --> fake fullscreen
+		restorestate = 1; // go back into tiled
+
+	/* If leaving fullscreen and the window was previously fake fullscreen (2), then restore
+	 * that while staying in fullscreen. The exception to this is if we are in said state, but
+	 * the client itself disables fullscreen (3) then we let the client go out of fullscreen
+	 * while keeping fake fullscreen enabled (as otherwise there will be a mismatch between the
+	 * client and the window manager's perception of the client's fullscreen state). */
+	if (c->fakefullscreen == 2 && !fullscreen && c->isfullscreen) {
+		c->fakefullscreen = 1;
 		c->isfullscreen = 1;
+		fullscreen = 1;
+	} else if (c->fakefullscreen == 3) // client exiting actual fullscreen
+		c->fakefullscreen = 1;
+
+	if (fullscreen != c->isfullscreen) { // only send property change if necessary
+		if (fullscreen)
+			XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+				PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
+		else
+			XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+				PropModeReplace, (unsigned char*)0, 0);
+	}
+
+	c->isfullscreen = fullscreen;
+
+	/* Some clients, e.g. firefox, will send a client message informing the window manager
+	 * that it is going into fullscreen after receiving the above signal. This has the side
+	 * effect of this function (setfullscreen) sometimes being called twice when toggling
+	 * fullscreen on and off via the window manager as opposed to the application itself.
+	 * To protect against obscure issues where the client settings are stored or restored
+	 * when they are not supposed to we add an additional bit-lock on the old state so that
+	 * settings can only be stored and restored in that precise order. */
+	if (savestate && !(c->oldstate & (1 << 1))) {
 		c->oldbw = c->bw;
-		c->oldstate = c->isfloating;
+		c->oldstate = c->isfloating | (1 << 1);
 		c->bw = 0;
 		c->isfloating = 1;
 		resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
 		XRaiseWindow(dpy, c->win);
-	} else if (!fullscreen && c->isfullscreen){
-		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-			PropModeReplace, (unsigned char*)0, 0);
-		c->isfullscreen = 0;
+	} else if (restorestate && (c->oldstate & (1 << 1))) {
 		c->bw = c->oldbw;
-		c->isfloating = c->oldstate;
+		c->isfloating = c->oldstate = c->oldstate & 1;
 		c->x = c->oldx;
 		c->y = c->oldy;
 		c->w = c->oldw;
 		c->h = c->oldh;
 		resizeclient(c, c->x, c->y, c->w, c->h);
-		arrange(c->mon);
-	}
+		restack(c->mon);
+	} else
+		resizeclient(c, c->x, c->y, c->w, c->h);
+
+	/* Exception: if the client was in actual fullscreen and we exit out to fake fullscreen
+	 * mode, then the focus would sometimes drift to whichever window is under the mouse cursor
+	 * at the time. To avoid this we ask X for all EnterNotify events and just ignore them.
+	 */
+	if (!c->isfullscreen)
+		while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 void
@@ -2110,6 +2206,10 @@ showhide(Client *c)
 	if (!c)
 		return;
 	if (ISVISIBLE(c)) {
+		if ((c->tags & SPTAGMASK) && c->isfloating) {
+			c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
+			c->y = c->mon->wy + (c->mon->wh / 2 - HEIGHT(c) / 2);
+		}
 		/* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if ((!c->mon->lt[c->mon->sellt]->arrange || c->isfloating)
@@ -2192,7 +2292,7 @@ togglefloating(const Arg *arg)
 		c = (Client*)arg->v;
 	if (!c)
 		return;
-	if (c->isfullscreen) /* no support for fullscreen windows */
+	if (c->isfullscreen && c->fakefullscreen != 1) /* no support for fullscreen windows */
 		return;
 	c->isfloating = !c->isfloating || c->isfixed;
 	if (c->isfloating)
@@ -2230,7 +2330,7 @@ toggleview(const Arg *arg)
 	if (newtagset) {
 		selmon->tagset[selmon->seltags] = newtagset;
 
-		if (newtagset == ~0)
+		if (newtagset == ~SPTAGMASK)
 		{
 			selmon->pertag->curtag = 0;
 		}

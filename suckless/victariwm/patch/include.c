@@ -14,9 +14,16 @@
 /* Other patches */
 #include "attachx.c"
 #include "autostart.c"
+#include "fakefullscreenclient.c"
+#include "focusdir.c"
 #include "movestack.c"
 #include "pertag.c"
 #include "restartsig.c"
+#include "scratchpad.c"
+#include "shift.c"
+#include "shiftviewclients.c"
+#include "sticky.c"
+#include "tagallmon.c"
 #include "vanitygaps.c"
 #include "seamless_restart.c"
 /* Layouts */

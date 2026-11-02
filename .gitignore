@@ -1,0 +1,4 @@
+# Artefactos de compilación (suckless)
+*.o
+suckless/victariwm/dwm
+suckless/slstatus/slstatus

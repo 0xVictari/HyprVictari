@@ -28,6 +28,8 @@ static const int showsystray             = 1;   /* 0 means no systray */
 static int tagindicatortype              = INDICATOR_TOP_LEFT_SQUARE;
 static int tiledindicatortype            = INDICATOR_NONE;
 static int floatindicatortype            = INDICATOR_TOP_LEFT_SQUARE;
+static int fakefsindicatortype           = INDICATOR_PLUS;
+static int floatfakefsindicatortype      = INDICATOR_PLUS_AND_LARGER_SQUARE;
 static const char *fonts[]               = { "GoMono Nerd Font:size=10" };
 static const char dmenufont[]            = "GoMono Nerd Font:size=10";
 
@@ -138,6 +140,19 @@ static char *tagicons[][NUMTAGS] =
  * Refer to the Rule struct definition for the list of available fields depending on
  * the patches you enable.
  */
+/* Scratchpads: terminales flotantes que se muestran/ocultan con una tecla */
+const char *spcmd1[] = { "kitty", "--name", "spterm", NULL };
+const char *spcmd2[] = { "kitty", "--name", "spbtop", "-e", "btop", NULL };
+static Sp scratchpads[] = {
+   /* name          cmd  */
+   {"spterm",      spcmd1},
+   {"spbtop",      spcmd2},
+};
+
+/* Clientes que van al primer tag vacío: en HDMI (sin usar el tag 1) o,
+ * si no hay HDMI, en eDP-1. Ver victariwm-src/local/freetag.diff */
+static const char *freetagclasses[] = { "Wfica" };
+
 static const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
@@ -149,8 +164,11 @@ static const Rule rules[] = {
 	RULE(.wintype = WTYPE "UTILITY", .isfloating = 1)
 	RULE(.wintype = WTYPE "TOOLBAR", .isfloating = 1)
 	RULE(.wintype = WTYPE "SPLASH", .isfloating = 1)
+	RULE(.instance = "spterm", .tags = SPTAG(0), .isfloating = 1)
+	RULE(.instance = "spbtop", .tags = SPTAG(1), .isfloating = 1)
+	RULE(.class = "slack", .tags = 1 << 1, .monitor = 0)      /* tag 2, eDP-1 */
+	RULE(.class = "TelegramDesktop", .tags = 1 << 2)           /* tag 3 */
 	RULE(.class = "Gimp", .tags = 1 << 4)
-	RULE(.class = "Firefox", .tags = 1 << 7)
 };
 
 /* Bar rules allow you to configure what is shown where on the bar, as well as
@@ -263,13 +281,25 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_m,          setlayout,              {.v = &layouts[2]} },
 	{ MODKEY,                       XK_space,      setlayout,              {0} },
 	{ MODKEY|ShiftMask,             XK_space,      togglefloating,         {0} },
-	{ MODKEY,                       XK_0,          view,                   {.ui = ~0 } },
-	{ MODKEY|ShiftMask,             XK_0,          tag,                    {.ui = ~0 } },
+	{ MODKEY,                       XK_0,          view,                   {.ui = ~SPTAGMASK } },
+	{ MODKEY|ShiftMask,             XK_0,          tag,                    {.ui = ~SPTAGMASK } },
 	{ MODKEY,                       XK_comma,      focusmon,               {.i = -1 } },
 	{ MODKEY,                       XK_period,     focusmon,               {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,      tagmon,                 {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period,     tagmon,                 {.i = +1 } },
 	{ MODKEY,                       XK_n,          togglealttag,           {0} },
+	{ MODKEY,                       XK_s,          togglescratch,          {.ui = 0 } },  /* terminal flotante */
+	{ MODKEY,                       XK_a,          togglescratch,          {.ui = 1 } },  /* btop flotante */
+	{ MODKEY|ShiftMask,             XK_f,          togglefakefullscreen,   {0} },
+	{ MODKEY|ShiftMask,             XK_t,          togglesticky,           {0} },         /* visible en todos los tags */
+	{ MODKEY,                       XK_Left,       focusdir,               {.i = 0 } },
+	{ MODKEY,                       XK_Right,      focusdir,               {.i = 1 } },
+	{ MODKEY,                       XK_Up,         focusdir,               {.i = 2 } },
+	{ MODKEY,                       XK_Down,       focusdir,               {.i = 3 } },
+	{ MODKEY|ControlMask,           XK_Left,       shiftviewclients,       {.i = -1 } },  /* tag ocupado anterior */
+	{ MODKEY|ControlMask,           XK_Right,      shiftviewclients,       {.i = +1 } },  /* tag ocupado siguiente */
+	{ MODKEY|ControlMask|ShiftMask, XK_comma,      tagallmon,              {.i = -1 } },  /* todo al otro monitor */
+	{ MODKEY|ControlMask|ShiftMask, XK_period,     tagallmon,              {.i = +1 } },
 	TAGKEYS(                        XK_1,                                  0)
 	TAGKEYS(                        XK_2,                                  1)
 	TAGKEYS(                        XK_3,                                  2)

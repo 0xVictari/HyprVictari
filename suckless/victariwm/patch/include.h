@@ -14,10 +14,17 @@
 /* Other patches */
 #include "attachx.h"
 #include "autostart.h"
+#include "fakefullscreenclient.h"
+#include "focusdir.h"
 #include "movestack.h"
 #include "pertag.h"
 #include "restartsig.h"
+#include "scratchpad.h"
 #include "seamless_restart.h"
+#include "shift.h"
+#include "shiftviewclients.h"
+#include "sticky.h"
+#include "tagallmon.h"
 #include "vanitygaps.h"
 /* Layouts */
 #include "layout_fibonacci.h"

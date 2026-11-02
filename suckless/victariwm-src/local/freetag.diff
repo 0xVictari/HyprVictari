@@ -1,0 +1,46 @@
+--- a/dwm.c
++++ b/dwm.c
+@@ -414,6 +414,29 @@
+ struct NumTags { char limitexceeded[NUMTAGS > 31 ? -1 : 1]; };
+ 
+ /* function implementations */
++/* local: freetag. Ubica el cliente en el primer tag vacío del monitor más grande
++ * (HDMI). Con más de un monitor el tag 1 queda reservado; con uno solo se usa
++ * cualquier tag vacío. Si no hay ninguno libre, aplica el comportamiento normal. */
++static void
++placefreetag(Client *c)
++{
++	Monitor *m, *target = mons;
++	Client *t;
++	unsigned int i, used = 0;
++
++	for (m = mons->next; m; m = m->next)
++		if (m->mw * m->mh > target->mw * target->mh)
++			target = m;
++	for (t = target->clients; t; t = t->next)
++		used |= t->tags;
++	for (i = mons->next ? 1 : 0; i < NUMTAGS; i++)
++		if (!(used & (1 << i))) {
++			c->mon = target;
++			c->tags = 1 << i;
++			return;
++		}
++}
++
+ void
+ applyrules(Client *c)
+ {
+@@ -451,6 +474,13 @@
+ 
+ 		}
+ 	}
++	/* local: freetag (solo ventanas principales; los diálogos flotan) */
++	if (!c->isfloating)
++		for (i = 0; i < LENGTH(freetagclasses); i++)
++			if (strstr(class, freetagclasses[i])) {
++				placefreetag(c);
++				break;
++			}
+ 	if (ch.res_class)
+ 		XFree(ch.res_class);
+ 	if (ch.res_name)
