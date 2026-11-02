@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 GNU Stow farm of dotfiles plus suckless builds, shared by two machines:
 
-- **Desktop (Wayland; moving from Artix to CachyOS):** Hyprland + Waybar + Wofi. `zsh/` and `zed/` are stowed there.
+- **Desktop (CachyOS, Wayland; Cinnamon/Xorg as fallback session):** Hyprland + Waybar + Wofi. `zsh/` and `zed/` are stowed there.
 - **Work laptop (Linux Mint 22, X11):** dwm (`victariwm`) + slstatus + sxhkd. `ohmyposh/`, `sxhkd/`, `dwm/`, `zsh/` and `clipboard/` are stowed here; `~/.config/zed/` is a local copy that has diverged from the repo on purpose.
 
 zsh is shared by both machines and never keyed on hostname (it changes): `zsh/.zshrc` holds the common setup, Arch-only bits (`in`, pacman/AUR aliases) sit behind `$+commands[pacman]`, and `~/.config/zsh/conf.d/*.zsh` modules self-activate when their tools exist. `conf.d/dev.zsh` is the work dev environment: it only runs if mise is installed (the desktop has none), activates mise and sources `~/.config/zsh/cloud.zsh` (tf/tg/aws aliases, `asp`, `tfplan`). The toolchain is the `mise/` stow package (`~/.config/mise/config.toml`); new machine: `curl https://mise.run | sh && stow zsh mise && mise install`. The old `~/projects/.devcontainer` is abandoned (Zed native instead). Unversioned per-machine bits go in `~/.zshrc.local`. When stowing `zsh` on a machine without `~/.config/zsh`, `mkdir -p` it first so stow doesn't fold the whole dir into the repo.
@@ -79,10 +79,13 @@ suckless/
   build-slstatus.sh
   # Old builds (dwm-current, vanilla dwm, vendored slstatus 1.0) live in git history; tag `suckless-pre-cleanup`
 
-dwm/.dwm/autostart.sh       # X11 session startup (run by dwm's autostart patch; stowed to ~/.dwm)
+dwm/.dwm/autostart.sh       # X11 session startup (run by dwm's autostart patch; stowed to ~/.dwm). Must stay distro-agnostic (e.g. polkit agent path differs Debian/Arch)
 dwm/.dwm/monitor-setup.sh   # Dual (HDMI-1 above eDP-1) / single layout + feh wallpaper refresh; used by sxhkd
 sxhkd/.config/sxhkd/sxhkdrc # X11 app keybindings
 clipboard/                  # clip-normalize script + systemd user unit (laptop only, X11)
+install/                    # CachyOS installer checklist (README.md) + cachyos-post-install.sh (run with sudo: --core/--cinnamon/--hyprland/--apps/--dotfiles)
+                            # + suckless-setup.sh (run as user, Debian or Arch family: --deps/--fonts/--build/--system/--dotfiles). Package lists live in the scripts; PACKAGES.md mirrors them. Artix scripts are in git history.
+PACKAGES.md                 # Package inventory per machine
 zsh/.zshrc                  # Shared shell config (Zap plugins, aliases, Arch-only `in` behind a pacman check)
 zsh/.config/zsh/conf.d/     # Self-activating modules (dev.zsh: mise + cloud.zsh, only where mise exists)
 zsh/.config/zsh/cloud.zsh   # AWS/Terraform/Terragrunt aliases and helpers
@@ -147,7 +150,7 @@ After modifying Hyprland configs, changes are picked up automatically or via `hy
 
 ## Pending / ideas
 
-- `artix-base-install.sh` / `artix-post-install.sh` are deprecated (Artix dropped XLibre; the XLibre/dinit stack no longer applies). To be rebuilt later for CachyOS; don't use them as a package reference — `PACKAGES.md` is the inventory.
+- `install/cachyos-post-install.sh` is untested on real hardware; `install/README.md` lists what to verify on the first install (No Desktop option, paru in repos, ly after Plymouth, AUR names).
 
 - Oh-My-Posh: proposal not applied yet — AWS profile as a real segment (red background for prod/prd/live profiles; today it is only a tooltip while typing `aws`), terraform workspace segment, execution time (>3 s), Python venv name, hide user unless SSH, drop the `in zsh` segment, delete `config.toml.bak`.
 - Clickable status blocks: possible with flexipatch's statuscmd patch without migrating to dwmblocks (not verified).

@@ -1,8 +1,9 @@
 # Inventario de paquetes
 
 Lo que usan los configs de este repo, separado por máquina. Los nombres para
-Arch valen para CachyOS, que es la base prevista para el Desktop.
-`artix-*.sh` está deprecado: usa el stack XLibre/dinit, que ya no aplica.
+Arch valen para CachyOS, la base del Desktop. Las listas que se instalan de
+verdad están al principio de `install/cachyos-post-install.sh`; si cambiás una,
+actualizá la otra.
 
 Estado verificado el 2026-11-02 en la laptop (Mint 22.2).
 
@@ -26,6 +27,8 @@ Estado verificado el 2026-11-02 en la laptop (Mint 22.2).
 | GoMono Nerd Font | dwm, slstatus, Zed | a mano en `~/.local/share/fonts` | `ttf-go-nerd` |
 
 ## Laptop — X11 / dwm (Mint)
+
+Lo instala `install/suckless-setup.sh`, que funciona en Debian/Mint y en Arch/CachyOS; las listas por familia están al principio del script.
 
 ### Compilar suckless (`suckless/`)
 
@@ -75,7 +78,7 @@ Opcionales (se activan solo si existen): `~/.dotnet/tools` (ilspycmd), `~/.openc
 
 ## Desktop — Wayland / Hyprland (CachyOS)
 
-Sale de los configs, sin verificar en la máquina (pacman; las de AUR están marcadas).
+Sale de los configs, sin verificar en la máquina. Lo instala `install/cachyos-post-install.sh` (módulos `--core`, `--hyprland`, `--apps`); ver `install/README.md`.
 
 | Paquetes | Lo usa |
 |---|---|
@@ -96,12 +99,13 @@ Sale de los configs, sin verificar en la máquina (pacman; las de AUR están mar
 | `kitty` | terminal |
 | `ttf-jetbrains-mono-nerd ttf-jetbrains-mono ttf-go-nerd noto-fonts noto-fonts-emoji` | Waybar, ghostty, Zed |
 | `paru` (AUR helper) | `in` y los aliases `up/un/pl/pa/pc/po` del `.zshrc` |
+| `ly` | gestor de login (`ly@tty2`) |
+| `cinnamon xorg-server xorg-xauth nemo xed xreader xviewer` | sesión de respaldo, Nemo y Xapps (módulo `--cinnamon`) |
 
 ## Pendientes detectados
 
 - **dmenu no está instalado en la laptop:** `Super+p` (dmenu_run) no hace nada. Las opciones son `sudo apt install suckless-tools` o pasar el bind a rofi.
 - **tree no está instalado en la laptop:** existe el alias `tree`, pero falta el binario (`sudo apt install tree`).
 - **ghostty:** hay config en `ghostty/`, pero no está instalado en la laptop.
-- **Scripts de instalación del Desktop:** `artix-base-install.sh` y `artix-post-install.sh` están deprecados. Hay que rearmarlos sobre CachyOS, sin el stack XLibre/dinit.
 - **brightness-control y su regla de sudoers** viven fuera del repo. En una reinstalación hay que recrearlos a mano.
 - **Fuente de GoMono Nerd Font en Mint:** no hay paquete apt, se instala a mano.
