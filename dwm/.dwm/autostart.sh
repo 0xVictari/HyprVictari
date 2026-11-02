@@ -19,7 +19,11 @@ setup_monitors
 feh --bg-scale ~/Pictures/background &
 sxhkd &
 slstatus &
-/usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
+# Agente polkit: la ruta cambia entre Debian/Mint y Arch
+for agent in /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 \
+             /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1; do
+    [ -x "$agent" ] && { "$agent" & break; }
+done
 xautolock -time 15 -locker "cinnamon-screensaver-command -l" \
  -killtime 30 -killer "systemctl suspend" &
 picom -b &
