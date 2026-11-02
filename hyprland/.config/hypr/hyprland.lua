@@ -1,6 +1,6 @@
 -- =============================================================================
 -- hyprland.lua  |  ~/.config/hypr/hyprland.lua
--- Hyprland 0.55.0
+-- Hyprland 0.57.0
 -- =============================================================================
 
 require("style")
@@ -33,9 +33,8 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/Scripts/wallpaper.sh")
     hl.exec_cmd("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
-    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
     hl.exec_cmd("flameshot")
-    hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/Scripts/hyprsunset.sh")
+    hl.exec_cmd("hyprsunset") -- horario 07:00/20:00 en hyprsunset.conf
 end)
 
 -- =============================
@@ -51,7 +50,6 @@ hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
 hl.env("QT_AUTO_SCREEN_SCALE_FACTOR",         "1")
 hl.env("MOZ_ENABLE_WAYLAND",                  "1")
 hl.env("GDK_SCALE",                           "1")
-hl.env("WLR_NO_HARDWARE_CURSORS",             "1")
 
 -- =============
 ---- INPUT ----
@@ -71,11 +69,6 @@ hl.config({
     },
 })
 
-hl.device({
-    name        = "epic-mouse-v1",
-    sensitivity = -0.5,
-})
-
 -- ============
 ---- MISC ----
 -- ============
@@ -93,8 +86,8 @@ hl.window_rule({ match = { class = ".*" },                      suppress_event =
 hl.window_rule({ match = { class = "^org.telegram.desktop$" }, workspace = "2 silent" })
 hl.window_rule({ match = { class = "^discord$" },              workspace = "3 silent" })
 hl.window_rule({ match = { class = "^steam$" },                workspace = "5 silent" })
-hl.window_rule({ match = { class = "^steam$" },                immediate = true })
 hl.window_rule({ match = { class = "^steam$" },                force_rgbx = true })
+-- immediate (tearing) solo tiene efecto con general.allow_tearing = true (style.lua)
 -- hl.window_rule({ match = { class = "^steamwebhelper$" },       immediate = true })
 -- hl.window_rule({ match = { class = "^steam_app.*" },           immediate = true })
 hl.window_rule({ match = { class = "^steam$", title = "^notificationtoasts" }, no_initial_focus = true })
@@ -114,7 +107,7 @@ hl.config({
         fullscreen_on_one_column = true,
         follow_focus             = true,
         focus_fit_method         = 1,
-        explicit_column_widths   = "0.333 0.5 0.667 1.0",
+        explicit_column_widths   = "0.333, 0.5, 0.667, 1.0",
     },
 })
 
@@ -137,10 +130,10 @@ hl.bind(mainMod .. " + P",       hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J",       hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + L",       hl.dsp.exec_cmd("hyprlock"))
-hl.bind(mainMod .. " + B",       hl.dsp.exec_cmd("killall hyprsunset || hyprsunset -t 4000"))
+hl.bind(mainMod .. " + B",       hl.dsp.exec_cmd(os.getenv("HOME") .. "/.config/hypr/Scripts/hyprsunset-toggle.sh"))
 
 hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd(
-    os.getenv("HOME") .. "/.config/hypr/Scripts/gaming-mode-toggle.sh && pkill -RTMIN+8 waybar"
+    os.getenv("HOME") .. "/.config/hypr/Scripts/gaming-mode-toggle.sh"
 ))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("flameshot gui"))
 hl.bind("CTRL + ALT + W",        hl.dsp.exec_cmd("killall waybar || waybar"))
@@ -173,7 +166,7 @@ hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 -- Mouse: scroll entre workspaces
 hl.bind(mainMod .. " + SHIFT + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
-hl.bind(mainMod .. " + SHIFT + mouse_up",   hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + SHIFT + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 
 -- Scrolling layout: scroll columnas con rueda
 hl.bind(mainMod .. " + mouse_down", hl.dsp.layout("move -col"))

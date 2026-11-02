@@ -62,7 +62,7 @@ All other directories are pure configuration files with no build step.
 ## Architecture & Layout
 
 ```
-hyprland/.config/hypr/     # Wayland WM: hyprland.lua, style, bindings (desktop)
+hyprland/.config/hypr/     # Wayland WM (desktop, stowed; ~/.config/hypr is a folded symlink): hyprland.lua + style.lua, hypr{idle,lock,paper,sunset}.conf, Scripts/
 waybar/.config/waybar/      # Status bar: config.jsonc + style.css
 wofi/.config/wofi/          # Launcher: config + style.css
 

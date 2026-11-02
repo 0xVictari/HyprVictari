@@ -3,7 +3,6 @@
 STATE_FILE="/tmp/gaming-mode-state"
 MONITOR_PID_FILE="/tmp/gaming-mode-monitor.pid"
 INHIBIT_PID_FILE="/tmp/gaming-mode-inhibit.pid"
-CONFIG_FILE="$HOME/.config/hypr/gaming-apps.conf"
 LOG_FILE="/tmp/gaming-mode.log"
 
 log() {
@@ -12,37 +11,13 @@ log() {
 
 log "=== Monitor started (PID: $$) ==="
 
-# Load gaming apps from config file or use defaults
-if [ -f "$CONFIG_FILE" ]; then
-    mapfile -t GAMING_APPS < <(grep -v '^#' "$CONFIG_FILE" | grep -v '^[[:space:]]*$')
-    log "Loaded ${#GAMING_APPS[@]} apps from config file"
-else
-    GAMING_APPS=(
-        "steam"
-        "steam_app"
-        "retroarch"
-        "melonds"
-        "duckstation"
-        "gzdoom"
-        "woof"
-        "openmw"
-    )
-    log "Using default app list (${#GAMING_APPS[@]} apps)"
-fi
-
-# Log the app list
-log "Monitoring apps: ${GAMING_APPS[*]}"
-
-PATTERN=$(IFS='|'; echo "${GAMING_APPS[*]}")
+source "$(dirname "$0")/gaming-mode-detect.sh"
+log "Monitoring Steam games + apps: ${GAMING_APPS[*]}"
 
 check_gaming_apps() {
-    local result=$(pgrep -i "($PATTERN)")
-    if [ -n "$result" ]; then
-        log "Found running apps: $(echo $result | xargs -I{} ps -p {} -o comm= | tr '\n' ', ')"
-        return 0
-    else
-        return 1
-    fi
+    local game
+    game=$(find_game) || return 1
+    log "Found running game: $game"
 }
 
 # Initial grace period

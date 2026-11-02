@@ -1,31 +1,31 @@
 #!/bin/bash
+# Fondo aleatorio de ~/Pictures cada 5 min via IPC de hyprpaper.
+# hyprpaper >= 0.8 no tiene preload/unload: "wallpaper" carga la imagen solo.
 interval=300
-walldir=~/Pictures/
-monitor=$(hyprctl monitors | grep Monitor | awk '{print $2}')
+walldir=~/Pictures
 
-# Get list of already preloaded wallpapers to clean up
-cleanup_old_wallpapers() {
-    # Unload previous wallpaper if you're tracking it
-    if [ -f /tmp/current_wallpaper ]; then
-        old_img=$(cat /tmp/current_wallpaper)
-        hyprctl hyprpaper unload "$old_img" 2>/dev/null
-    fi
+mkdir -p ~/.local/share/wallpapers
+
+# Reintenta porque hyprpaper arranca a la vez que este script.
+set_wallpaper() {
+    local img=$1 mon try
+    for mon in $(hyprctl monitors | awk '/^Monitor/ {print $2}'); do
+        for try in {1..10}; do
+            hyprctl hyprpaper wallpaper "$mon,$img,contain" >/dev/null && break
+            sleep 1
+        done
+    done
 }
 
 while true; do
-    find "$walldir" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" \) | shuf | while read -r img; do
-        cleanup_old_wallpapers
-
-        # Create symlink
+    mapfile -t imgs < <(find "$walldir" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) | shuf)
+    if (( ${#imgs[@]} == 0 )); then
+        sleep "$interval"
+        continue
+    fi
+    for img in "${imgs[@]}"; do
         ln -f "$img" ~/.local/share/wallpapers/background
-
-        # Preload and set wallpaper
-        hyprctl hyprpaper preload "$img"
-        hyprctl hyprpaper wallpaper "$monitor,$img, contain"
-
-        # Store current wallpaper for next cleanup
-        echo "$img" > /tmp/current_wallpaper
-
-        sleep $interval
+        set_wallpaper "$img"
+        sleep "$interval"
     done
 done

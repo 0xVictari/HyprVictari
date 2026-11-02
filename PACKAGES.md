@@ -82,7 +82,7 @@ Sale de los configs, sin verificar en la máquina. Lo instala `install/cachyos-p
 
 | Paquetes | Lo usa |
 |---|---|
-| `hyprland hypridle hyprlock hyprpaper hyprsunset` | `hypr/` (lua, idle, lock, wallpaper, `hyprsunset.sh`) |
+| `hyprland hypridle hyprlock hyprpaper hyprsunset` | `hypr/` (lua, idle, lock, wallpaper, `hyprsunset.conf`) |
 | `xdg-desktop-portal-hyprland xdg-desktop-portal-gtk qt5-wayland qt6-wayland` | integración de apps con Wayland |
 | `polkit-gnome` | agente polkit (exec en `hyprland.lua`) |
 | `waybar` | barra (`waybar/`) |
@@ -93,7 +93,7 @@ Sale de los configs, sin verificar en la máquina. Lo instala `install/cachyos-p
 | `brightnessctl` | brillo (bindings) |
 | `cava` | `hypr/Scripts/cava.sh`, módulo de Waybar |
 | `playerctl` | control multimedia |
-| `libnotify` | `notify-send` (gaming mode, hyprsunset) |
+| `libnotify` | `notify-send` (gaming mode) |
 | `flameshot grim slurp wl-clipboard` | capturas y clipboard |
 | `dunst` | notificaciones |
 | `kitty` | terminal |
