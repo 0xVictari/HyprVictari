@@ -6,6 +6,3 @@
 
 eval "$(mise activate zsh)"
 source ~/.config/zsh/cloud.zsh
-
-[[ -d ~/.dotnet/tools ]]  && path+=(~/.dotnet/tools)
-[[ -d ~/.opencode/bin ]]  && path=(~/.opencode/bin $path)

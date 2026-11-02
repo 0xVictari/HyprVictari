@@ -13,6 +13,8 @@ plug "zsh-users/zsh-syntax-highlighting"
 typeset -U path   # sin duplicados
 path=(~/.local/bin $path)
 [[ -d ~/.npm-global/bin ]] && path=(~/.npm-global/bin $path)
+[[ -d ~/.opencode/bin ]]   && path=(~/.opencode/bin $path)
+[[ -d ~/.dotnet/tools ]]   && path+=(~/.dotnet/tools)
 
 # --- Completion (supercharge ya corre compinit; esto cubre el caso sin Zap) ---
 if (( ! $+functions[compdef] )); then
@@ -40,9 +42,11 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias .3='cd ../../..'
 alias .4='cd ../../../..'
+alias .5='cd ../../../../..'
 alias mkdir='mkdir -p'
 alias tree='tree -a -I .git'
 alias vim=nvim
+[[ -x ~/doomwads/doom-infinite.sh ]] && alias doom-infinite=~/doomwads/doom-infinite.sh
 
 if (( $+commands[eza] )); then
   alias ls='eza -A --icons=auto'
