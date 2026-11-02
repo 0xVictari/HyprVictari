@@ -99,7 +99,7 @@ hl.window_rule({ match = { class = "^steam$" },                force_rgbx = true
 -- hl.window_rule({ match = { class = "^steam_app.*" },           immediate = true })
 hl.window_rule({ match = { class = "^steam$", title = "^notificationtoasts" }, no_initial_focus = true })
 hl.window_rule({ match = { class = "^dev.zed.Zed$" },         workspace = "4 silent" })
-
+-- hl.window_rule({ match = { class = "^gunz.exe$" }, fullscreen = true })
 -- ====================
 ---- LAYOUTS      ----
 -- ====================
@@ -186,3 +186,4 @@ hl.bind(mainMod .. " + SHIFT + right", hl.dsp.layout("swapcol r"))
 -- Scrolling layout: resize columna
 hl.bind(mainMod .. " + SHIFT + up",   hl.dsp.layout("colresize 1.0"))
 hl.bind(mainMod .. " + SHIFT + down", hl.dsp.layout("colresize 0.5"))
+
