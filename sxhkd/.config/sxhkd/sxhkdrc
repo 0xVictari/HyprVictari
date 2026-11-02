@@ -19,3 +19,15 @@ control + alt + l
 # Screenshot Area to Clipboard
 super + shift + s
     flameshot gui
+
+# Kill Brave Browser
+super + shift + b
+    killall brave
+
+# Kill Citrix Workspace
+super + shift + x
+    killall wfica
+
+# Toggle monitor layout (single/dual HDMI)
+super + shift + m
+    ~/.dwm/monitor-setup.sh
