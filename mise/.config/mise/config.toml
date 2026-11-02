@@ -1,0 +1,44 @@
+# Toolchain de desarrollo (laptop de trabajo). Lo instala mise:
+#   curl https://mise.run | sh && stow mise && mise install
+# Un repo puede pisar versiones con su propio .terraform-version / .tool-versions / mise.toml.
+
+[tools]
+# --- IaC ---
+terraform = "1.13.4"          # = .terraform-version de devops-infra / terraform-modules
+terragrunt = "latest"
+tflint = "latest"
+terraform-docs = "latest"
+trivy = "latest"              # reemplaza tfsec
+pre-commit = "latest"         # devops-infra lo usa (fmt, validate, tflint, ruff)
+actionlint = "latest"         # lint de workflows de GitHub Actions (galicia daop_*)
+
+# --- Visualizar plans (TUI, sin webserver) ---
+"github:dineshba/tf-summarize" = "latest"   # resumen/árbol de un plan
+"pipx:tftui" = "latest"                     # TUI de state + plan
+
+# --- AWS ---
+aws-cli = "2"
+granted = "latest"            # `assume <perfil>`: cambio de perfil/SSO, abre consola
+"github:keidarcy/e1s" = "latest"            # TUI para ECS (k9s-like)
+k9s = "latest"                # EKS / Strimzi
+kubectl = "latest"
+
+# --- Lenguajes ---
+python = "3.12"
+uv = "latest"                 # reemplaza venv + pip (y setup-venvs.sh)
+ruff = "latest"               # lint + format; Zed lo usa nativo
+node = "22"                   # LTS (20 llegó a EOL en abr-2026)
+"npm:aws-cdk" = "latest"
+
+# --- TUIs / CLI generales ---
+lazygit = "latest"
+lazydocker = "latest"
+gh = "latest"
+fzf = "latest"
+yq = "latest"
+bat = "latest"
+delta = "latest"
+fd = "latest"
+zoxide = "latest"
+glow = "latest"               # markdown en terminal (READMEs, DRP_plan.md)
+syft = "latest"               # SBOM (estaba en v1)
