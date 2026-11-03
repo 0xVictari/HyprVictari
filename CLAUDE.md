@@ -115,7 +115,7 @@ Lua config (`hyprland.lua` + `style.lua`), Hyprland 0.57. The session stack (way
 
 ## dwm (victariwm) — current state
 
-Enabled patches (besides bar modules, autostart, pertag, vanitygaps, restartsig, seamless_restart, movestack): scratchpads, fakefullscreen_client, shiftview_clients, sticky, focusdir, tagallmon, sendmon_center, alwayscenter, movecenter. Layouts: tile, monocle, fibonacci dwindle. Full key list in `suckless/README.md`.
+Enabled patches (besides bar modules, autostart, pertag, vanitygaps, restartsig, seamless_restart, movestack): statuscmd, scratchpads, fakefullscreen_client, shiftview_clients, sticky, focusdir, tagallmon, sendmon_center, alwayscenter, movecenter. Layouts: tile, monocle, fibonacci dwindle. Full key list in `suckless/README.md`.
 
 Rules (`config.h`): Slack → tag 2 on monitor 0 (eDP-1); Telegram → tag 3; Gimp → tag 5; scratchpads `spterm` (kitty), `spbtop`, `spdocker` (lazydocker via the mise shim at `$HOME/.local/share/mise/shims`, run through `sh -c` so no username is hardcoded; dwm lacks the zsh PATH).
 
@@ -137,6 +137,7 @@ Keybinding gotchas:
 - `awk` needs `LC_ALL=C` (Spanish locale parses `0.55` as 0).
 - Temperature reads `/sys/class/thermal/thermal_zone16/temp` (`x86_pkg_temp`); if it shows `n/a` after a kernel update, find the zone again.
 - Nerd Font "md" glyphs (U+F0000+) render wider and eat the following space; flexipatch 6.8 removed status2d padding, so the status needs a leading space.
+- Clickable blocks (statuscmd, no dwmblocks): each block's format starts with an octal marker `\001`…`\006` (CPU and RAM share `\005`); dwm runs `statuscmds[]` in `victariwm/config.h` under `/bin/sh` (dash) with `$BUTTON`. Write markers in octal: `\x01` followed by a hex digit swallows it. Adding a block = new marker + new `statuscmds[]` entry.
 - Band comes from `iwgetid wlp1s0 -f -r` (Hz). Interval is 1 s for everything; keep `run_command`s cheap (no `docker`, no network calls).
 
 ## Clipboard fix (Zed -> Citrix, laptop only)
@@ -169,4 +170,3 @@ On the desktop, run `./check.sh` after `pacman -Syu` or config changes (`--quick
 
 - `install/cachyos-post-install.sh` is untested on real hardware; `install/README.md` lists what to verify on the first install (No Desktop option, paru in repos, ly after Plymouth, AUR names).
 
-- Clickable status blocks: possible with flexipatch's statuscmd patch without migrating to dwmblocks (not verified).

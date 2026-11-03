@@ -366,6 +366,7 @@ static void zoom(const Arg *arg);
 /* variables */
 static const char broken[] = "broken";
 static char stext[1024];
+static char rawstext[1024];
 
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
@@ -605,6 +606,8 @@ buttonpress(XEvent *e)
 	const BarRule *br;
 	BarArg carg = { 0, 0, 0, 0 };
 	click = ClkRootWin;
+
+	*lastbutton = '0' + ev->button;
 
 	/* focus monitor if necessary */
 	if ((m = wintomon(ev->window)) && m != selmon
@@ -2283,6 +2286,17 @@ spawn(const Arg *arg)
 		if (dpy)
 			close(ConnectionNumber(dpy));
 
+		if (arg->v == statuscmd) {
+			for (int i = 0; i < LENGTH(statuscmds); i++) {
+				if (statuscmdn == statuscmds[i].id) {
+					statuscmd[2] = statuscmds[i].cmd;
+					setenv("BUTTON", lastbutton, 1);
+					break;
+				}
+			}
+			if (!statuscmd[2])
+				exit(EXIT_SUCCESS);
+		}
 		setsid();
 
 		sigemptyset(&sa.sa_mask);
@@ -2681,8 +2695,10 @@ void
 updatestatus(void)
 {
 	Monitor *m;
-	if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
+	if (!gettextprop(root, XA_WM_NAME, rawstext, sizeof(rawstext)))
 		strcpy(stext, "dwm-"VERSION);
+	else
+		copyvalidchars(stext, rawstext);
 	for (m = mons; m; m = m->next)
 		drawbar(m);
 }

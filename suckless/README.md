@@ -77,6 +77,19 @@
 
 Volumen ±5 % y mute (`wpctl`), mute de micrófono, brillo ±5 %.
 
+## Barra (clicks en el status)
+
+| Bloque | Izq. | Der. | Rueda |
+|---|---|---|---|
+| Mic | mute/unmute | pavucontrol (entradas) | — |
+| Volumen | mute | pavucontrol (salidas) | ±5 % (tope 100 %) |
+| Reloj | notificación con la fecha | — | — |
+| WiFi | `nmtui` en kitty | nm-connection-editor | — |
+| CPU/temp, RAM | btop en kitty | — | — |
+| Batería | notificación (estado, tiempo, consumo) | — | — |
+
+Patch statuscmd: slstatus pone `\001`…`\006` antes de cada bloque (`slstatus-src/config.h`) y dwm corre `statuscmds[]` (`victariwm/config.h`) con el botón en `$BUTTON`.
+
 ## Sesión
 
 | Atajo | Acción |

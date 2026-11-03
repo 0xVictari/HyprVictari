@@ -1,19 +1,13 @@
 int
 width_status2d(Bar *bar, BarArg *a)
 {
-	return status2dtextlength(stext);
+	return status2dtextlength(rawstext);
 }
 
 int
 draw_status2d(Bar *bar, BarArg *a)
 {
-	return drawstatusbar(a, stext);
-}
-
-int
-click_status2d(Bar *bar, Arg *arg, BarArg *a)
-{
-	return ClkStatusText;
+	return drawstatusbar(a, rawstext);
 }
 
 int
@@ -30,7 +24,7 @@ drawstatusbar(BarArg *a, char* stext)
 	if (!(text = (char*) malloc(sizeof(char)*(len + 1))))
 		die("malloc");
 	p = text;
-	memcpy(text, stext, len);
+	copyvalidchars(text, stext);
 	text[len] = '\0';
 
 	drw_setscheme(drw, scheme[LENGTH(colors)]);
@@ -138,7 +132,7 @@ status2dtextlength(char* stext)
 	if (!(text = (char*) malloc(sizeof(char)*len)))
 		die("malloc");
 	p = text;
-	memcpy(text, stext, len);
+	copyvalidchars(text, stext);
 
 	/* compute width of the status text */
 	w = 0;

@@ -63,21 +63,23 @@ static const char unknown_str[] = "n/a";
  * wifi_essid          WiFi ESSID                      interface name (wlan0)
  * wifi_perc           WiFi signal in percent          interface name (wlan0)
  */
+ /* \00N before a block makes it clickable: dwm runs statuscmds[] id N
+  * (victariwm/config.h). Octal on purpose: \x01 would eat a following hex digit. */
  static const struct arg args[] = {
 	/* function       format                          argument */
 	/* micrófono: solo aparece (en rojo) cuando está ABIERTO */
-	{ run_command,    " ^c#ef4444^%s^d^",               "wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED && echo || echo '󰍬^d^ | '" },
+	{ run_command,    "\001 ^c#ef4444^%s^d^",               "wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED && echo || echo '󰍬^d^ | '" },
 	/* volumen: ícono distinto si está en mute (wpctl, igual que las teclas de dwm) */
-	{ run_command,    "^c#f59e0b^%s^d^ | ",             "wpctl get-volume @DEFAULT_AUDIO_SINK@ | LC_ALL=C awk '{printf \"%s %d%%\", ($3==\"[MUTED]\" ? \"󰝟\" : \"󰕾\"), $2*100}'" },
-	{ datetime,       "^c#84cc16^󰅐 %s^d^ | ",           "%I:%M:%S %p" },
+	{ run_command,    "\002^c#f59e0b^%s^d^ | ",             "wpctl get-volume @DEFAULT_AUDIO_SINK@ | LC_ALL=C awk '{printf \"%s %d%%\", ($3==\"[MUTED]\" ? \"󰝟\" : \"󰕾\"), $2*100}'" },
+	{ datetime,       "\003^c#84cc16^󰅐 %s^d^ | ",           "%I:%M:%S %p" },
 	/* SSID cortado a 5 caracteres + banda calculada de la frecuencia */
-	{ wifi_essid,     "^c#3b82f6^ %.5s ",            "wlp1s0" },
+	{ wifi_essid,     "\004^c#3b82f6^ %.5s ",            "wlp1s0" },
 	{ run_command,    "%s ",                           "iwgetid wlp1s0 -f -r | LC_ALL=C awk '{f=$1/1e9; print (f>=5.9 ? \"6G\" : (f>=4.9 ? \"5G\" : \"2G\"))}'" },
 	{ wifi_perc,      "%s%%^d^ | ",                     "wlp1s0" },
-	{ cpu_perc,       "^c#06b6d4^ %s%%^d^ ",          NULL },
+	{ cpu_perc,       "\005^c#06b6d4^ %s%%^d^ ",          NULL },
 	/* zona x86_pkg_temp; si muestra n/a tras un update de kernel, buscarla de nuevo */
 	{ temp,           "^c#06b6d4^%s°^d^ | ",            "/sys/class/thermal/thermal_zone16/temp" },
-	{ ram_perc,       "^c#a855f7^󰫗 %s%%^d^ | ",         NULL },
-	{ battery_state,  "^c#f43f5e^ %s ",               "BAT0" },
+	{ ram_perc,       "\005^c#a855f7^󰫗 %s%%^d^ | ",         NULL },
+	{ battery_state,  "\006^c#f43f5e^ %s ",               "BAT0" },
 	{ battery_perc,   "%s%%^d^",                       "BAT0" },
  };

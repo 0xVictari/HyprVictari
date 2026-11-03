@@ -193,7 +193,7 @@ static const BarRule barrules[] = {
 	{ -1,        0,     BAR_ALIGN_LEFT,   width_tags,               draw_tags,              click_tags,              hover_tags,              "tags" },
 	{  0,        0,     BAR_ALIGN_RIGHT,  width_systray,            draw_systray,           click_systray,           NULL,                    "systray" },
 	{ -1,        0,     BAR_ALIGN_LEFT,   width_ltsymbol,           draw_ltsymbol,          click_ltsymbol,          NULL,                    "layout" },
-	{ statusmon, 0,     BAR_ALIGN_RIGHT,  width_status2d,           draw_status2d,          click_status2d,          NULL,                    "status2d" },
+	{ statusmon, 0,     BAR_ALIGN_RIGHT,  width_status2d,           draw_status2d,          click_statuscmd,         NULL,                    "status2d" },
 	{ -1,        0,     BAR_ALIGN_NONE,   width_wintitle,           draw_wintitle,          click_wintitle,          NULL,                    "wintitle" },
 };
 
@@ -233,6 +233,26 @@ static const char *dmenucmd[] = {
 	NULL
 };
 static const char *termcmd[]  = { "kitty", NULL };
+
+/* clickable status blocks (statuscmd): slstatus-src/config.h puts \00N before each
+ * block; clicking runs the command with that id, mouse button in $BUTTON
+ * (1 left, 2 middle, 3 right, 4/5 wheel). Runs under /bin/sh with dwm's PATH. */
+static const StatusCmd statuscmds[] = {
+	/* mic */
+	{ "case $BUTTON in 1) wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle;; 3) pavucontrol -t 4;; esac", 1 },
+	/* volume */
+	{ "case $BUTTON in 1) wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle;; 3) pavucontrol -t 3;;"
+	  " 4) wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+;; 5) wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-;; esac", 2 },
+	/* clock */
+	{ "[ $BUTTON = 1 ] && notify-send \"$(date '+%A %d de %B de %Y')\"", 3 },
+	/* wifi */
+	{ "case $BUTTON in 1) kitty -e nmtui;; 3) nm-connection-editor;; esac", 4 },
+	/* cpu/temp and ram */
+	{ "[ $BUTTON = 1 ] && kitty -e btop", 5 },
+	/* battery */
+	{ "[ $BUTTON = 1 ] && notify-send Batería \"$(upower -i $(upower -e | grep BAT) | grep -E 'state|time to|percentage|energy-rate' | sed 's/^ *//')\"", 6 },
+};
+static const char *statuscmd[] = { "/bin/sh", "-c", NULL, NULL };
 
 /* custom commands */
 static const char *upvol[]      = { "/usr/bin/wpctl",   "set-volume", "@DEFAULT_AUDIO_SINK@",      "5%+",      NULL };
@@ -326,7 +346,11 @@ static const Button buttons[] = {
 	{ ClkLtSymbol,          0,                   Button1,        setlayout,      {0} },
 	{ ClkLtSymbol,          0,                   Button3,        setlayout,      {.v = &layouts[2]} },
 	{ ClkWinTitle,          0,                   Button2,        zoom,           {0} },
-	{ ClkStatusText,        0,                   Button2,        spawn,          {.v = termcmd } },
+	{ ClkStatusText,        0,                   Button1,        spawn,          {.v = statuscmd } },
+	{ ClkStatusText,        0,                   Button2,        spawn,          {.v = statuscmd } },
+	{ ClkStatusText,        0,                   Button3,        spawn,          {.v = statuscmd } },
+	{ ClkStatusText,        0,                   Button4,        spawn,          {.v = statuscmd } },
+	{ ClkStatusText,        0,                   Button5,        spawn,          {.v = statuscmd } },
 	{ ClkClientWin,         MODKEY,              Button1,        movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,              Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,              Button3,        resizemouse,    {0} },
