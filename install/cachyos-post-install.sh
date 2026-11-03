@@ -73,7 +73,7 @@ qogir-gtk-theme qogir-icon-theme qogir-cursor-theme"
 # --- Dotfiles ---
 DOTFILES_REPO="https://github.com/0xVictari/HyprVictari.git"
 DOTFILES_PUSH="git@github.com:0xVictari/HyprVictari.git"
-DOTFILES_STOW="zsh ohmyposh hyprland waybar wofi kitty ghostty zed fastfetch"
+DOTFILES_STOW="zsh ohmyposh hyprland waybar wofi dunst kitty ghostty zed fastfetch"
 
 # Paquetes de CachyOS que traen su propia config de Hyprland y chocan con stow
 CACHYOS_HYPR_SETTINGS="cachyos-hyprland-settings"

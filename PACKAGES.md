@@ -86,7 +86,7 @@ Sale de los configs, sin verificar en la máquina. Lo instala `install/cachyos-p
 | `xdg-desktop-portal-hyprland xdg-desktop-portal-gtk qt5-wayland qt6-wayland` | integración de apps con Wayland |
 | `polkit-gnome` | agente polkit (exec en `hyprland.lua`) |
 | `waybar` | barra (`waybar/`) |
-| `wofi` | lanzador (`wofi/`, Waybar) |
+| `wofi` | lanzador (`wofi/`, Waybar), ayuda de atajos (`Super+F1`) |
 | `wlogout` | menú de apagado (Waybar) |
 | `pavucontrol` | click en el módulo de audio de Waybar |
 | `pipewire pipewire-pulse wireplumber` | audio |
@@ -95,7 +95,7 @@ Sale de los configs, sin verificar en la máquina. Lo instala `install/cachyos-p
 | `playerctl` | control multimedia |
 | `libnotify` | `notify-send` (gaming mode) |
 | `flameshot grim slurp wl-clipboard` | capturas y clipboard |
-| `dunst` | notificaciones |
+| `dunst` | notificaciones (`dunst/`) |
 | `kitty` | terminal |
 | `ttf-jetbrains-mono-nerd ttf-jetbrains-mono ttf-go-nerd noto-fonts noto-fonts-emoji` | Waybar, ghostty, Zed |
 | `paru` (AUR helper) | `in` y los aliases `up/un/pl/pa/pc/po` del `.zshrc` |

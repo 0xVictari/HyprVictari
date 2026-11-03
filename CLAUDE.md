@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 GNU Stow farm of dotfiles plus suckless builds, shared by two machines:
 
-- **Desktop (CachyOS, Wayland; Cinnamon/Xorg as fallback session):** Hyprland + Waybar + Wofi. `zsh/` and `zed/` are stowed there.
+- **Desktop (CachyOS, Wayland; Cinnamon/Xorg as fallback session):** Hyprland + Waybar + Wofi + dunst. Stowed there: `zsh hyprland waybar wofi dunst ohmyposh fastfetch zed` (the `.config` ones are folded symlinks into the repo).
 - **Work laptop (Linux Mint 22, X11):** dwm (`victariwm`) + slstatus + sxhkd. `ohmyposh/`, `sxhkd/`, `dwm/`, `zsh/` and `clipboard/` are stowed here; `~/.config/zed/` is a local copy that has diverged from the repo on purpose.
 
 zsh is shared by both machines and never keyed on hostname (it changes): `zsh/.zshrc` holds the common setup, Arch-only bits (`in`, pacman/AUR aliases) sit behind `$+commands[pacman]`, and `~/.config/zsh/conf.d/*.zsh` modules self-activate when their tools exist. `conf.d/dev.zsh` is the work dev environment: it only runs if mise is installed (the desktop has none), activates mise and sources `~/.config/zsh/cloud.zsh` (tf/tg/aws aliases, `asp`, `tfplan`). The toolchain is the `mise/` stow package (`~/.config/mise/config.toml`); new machine: `curl https://mise.run | sh && stow zsh mise && mise install`. The old `~/projects/.devcontainer` is abandoned (Zed native instead). Unversioned per-machine bits go in `~/.zshrc.local`. When stowing `zsh` on a machine without `~/.config/zsh`, `mkdir -p` it first so stow doesn't fold the whole dir into the repo.
@@ -65,6 +65,8 @@ All other directories are pure configuration files with no build step.
 hyprland/.config/hypr/     # Wayland WM (desktop, stowed; ~/.config/hypr is a folded symlink): hyprland.lua + style.lua, hypr{idle,lock,paper,sunset}.conf, Scripts/
 waybar/.config/waybar/      # Status bar: config.jsonc + style.css
 wofi/.config/wofi/          # Launcher: config + style.css
+dunst/.config/dunst/        # Notifications (desktop): dunstrc, only overrides of /etc/dunst/dunstrc
+check.sh                    # Post-update checks (Hyprland/Waybar/hyprlock/hypridle/scripts); not a stow package
 
 suckless/
   README.md                 # Keybinding cheat sheet (dwm + sxhkd), rules, rebuild steps — keep in sync with config.h/sxhkdrc
@@ -97,6 +99,17 @@ zed/.config/zed/            # Zed editor settings (stowed on desktop only)
 ```
 
 Do not put loose files (READMEs, notes) inside stow packages like `dwm/` or `sxhkd/`: stow would link them into `$HOME`.
+
+## Hyprland (desktop) — current state
+
+Lua config (`hyprland.lua` + `style.lua`), Hyprland 0.57. The session stack (waybar, hypridle, hyprpaper, hyprsunset, wallpaper.sh, polkit, flameshot) is launched from `hl.on("hyprland.start")`, not systemd/uwsm (user preference: Hyprland owns its stack). Gotchas:
+
+- Every `hl.bind` carries `{ description = "..." }`: `Super+F1` (`Scripts/keybinds.sh`) lists them in wofi from `hyprctl binds -j`, and `check.sh` warns on binds without one.
+- With a Lua config, `hyprctl dispatch` takes Lua: `hyprctl dispatch 'hl.dsp.dpms({action = "on"})'`; the old `hyprctl dispatch dpms on` errors out (hypridle uses it).
+- hyprpaper 0.8 IPC has no `preload`/`unload`; `hyprctl hyprpaper wallpaper "MON,PATH,contain"` loads by itself (exit 1 on failure). `wallpaper.sh` retries because it starts alongside hyprpaper.
+- hyprsunset: schedule in `hyprsunset.conf` profiles; `Super+B` toggles 4000K/6500K over IPC. Avoid `identity`: hyprsunset doesn't reflect it in `temperature`.
+- Waybar: temperatures use `hwmon-path-abs` (PCI path), since `hwmonN` numbering changes between boots. `custom/cava` is centered, so right-side modules must not have `max-length` (GTK ellipsizes them instead of shifting the center). `killall waybar` doesn't kill module children: continuous `exec` scripts must die on SIGPIPE (`cava | sed -u`, no per-line subshells). GTK CSS rejects `0%, 100%` in one keyframe block (Waybar won't start).
+- Gaming mode detects Steam games via `reaper SteamLaunch AppId=`; the Steam client itself is not a game.
 
 ## dwm (victariwm) — current state
 
@@ -146,7 +159,9 @@ Zed on X11 only offers `UTF8_STRING` / `text/plain;charset=utf-8`; the Citrix Wo
 
 Configs are organized by `<app>/.config/<app>/` structure and deployed with stow (`stow <package>` from the repo root). The zsh config lives at `zsh/.zshrc` (maps to `~/.zshrc`).
 
-After modifying Hyprland configs, changes are picked up automatically or via `hyprctl reload`. Waybar requires restarting (`killall waybar && waybar &`). sxhkd: `pkill -USR1 -x sxhkd` reloads. Suckless components require the build scripts above.
+After modifying Hyprland configs, changes are picked up automatically or via `hyprctl reload`. Waybar requires restarting (`killall waybar && waybar &`). dunst: `killall dunst` (D-Bus restarts it on the next notification). sxhkd: `pkill -USR1 -x sxhkd` reloads. Suckless components require the build scripts above.
+
+On the desktop, run `./check.sh` after `pacman -Syu` or config changes (`--quick` skips the throwaway Waybar/hypridle instances). It exits 1 on failures.
 
 ## Pending / ideas
 
