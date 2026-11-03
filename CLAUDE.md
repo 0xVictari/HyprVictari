@@ -13,6 +13,8 @@ zsh is shared by both machines and never keyed on hostname (it changes): `zsh/.z
 
 Shell environment: zsh with Zap plugin manager, Oh-My-Posh prompt, kitty/ghostty terminals.
 
+Oh-My-Posh (`ohmyposh/.config/oh-my-posh/config.toml`, shared by both machines): left = OS, user@host only over SSH, folder, git, root, status; right = node/go/python icons (venv name when active), terraform workspace (hidden when `default`), AWS profile pill (`display_default = false`; red when the profile matches `prod|prd|live`, same for the workspace), `took` for commands over 3 s, clock. Keep segment settings under `properties`: newer versions call them `options` but still read `properties`, and the laptop may run an older version. The terraform segment runs `terraform workspace show` (needs the binary and a `.terraform` dir). To test a change: `env -u POSH_SESSION_ID -u POSH_CONFIG oh-my-posh print right --config <file> --shell zsh --plain` (with the session vars set it renders the cached config); running shells pick it up after `exec zsh`.
+
 The user writes in Spanish (rioplatense). **Confirm before structural changes** (rewriting scripts, moving files, changing workflows); small, requested edits can go ahead.
 
 ## Build Commands
@@ -167,5 +169,4 @@ On the desktop, run `./check.sh` after `pacman -Syu` or config changes (`--quick
 
 - `install/cachyos-post-install.sh` is untested on real hardware; `install/README.md` lists what to verify on the first install (No Desktop option, paru in repos, ly after Plymouth, AUR names).
 
-- Oh-My-Posh: proposal not applied yet — AWS profile as a real segment (red background for prod/prd/live profiles; today it is only a tooltip while typing `aws`), terraform workspace segment, execution time (>3 s), Python venv name, hide user unless SSH, drop the `in zsh` segment, delete `config.toml.bak`.
 - Clickable status blocks: possible with flexipatch's statuscmd patch without migrating to dwmblocks (not verified).

@@ -38,7 +38,7 @@ final_space = true
 
   [[blocks.segments]]
     style = 'powerline'
-    template = ' {{ if .SSHSession }} {{ end }}{{ .UserName }} '
+    template = '{{ if .SSHSession }}  {{ .UserName }}@{{ .HostName }} {{ end }}'
     foreground = 'p:black'
     powerline_symbol = ''
     background = 'p:magenta'
@@ -116,24 +116,55 @@ final_space = true
     [blocks.segments.properties]
       fetch_version = false
 
+  # Icono en proyectos Python; con un venv activo, su nombre (".venv" -> carpeta)
   [[blocks.segments]]
     style = 'plain'
-    template = ' '
+    template = ' {{ if .Venv }}{{ .Venv }} {{ end }}'
     foreground = 'p:yellow'
     background = 'transparent'
     type = 'python'
 
     [blocks.segments.properties]
-      display_mode = 'files'
+      display_mode = 'context'
       fetch_version = false
-      fetch_virtual_env = false
+      fetch_virtual_env = true
 
+  # Workspace de Terraform (carpetas con .terraform); "default" no se muestra
   [[blocks.segments]]
     style = 'plain'
-    template = 'in <p:blue><b>{{ .Name }}</b></> '
+    template = '{{ if ne .WorkspaceName "default" }}󱁢 {{ .WorkspaceName }} {{ end }}'
+    foreground = 'p:magenta'
+    background = 'transparent'
+    type = 'terraform'
+    foreground_templates = ['{{ if regexMatch "(?i)prod|prd|live" .WorkspaceName }}p:red{{ end }}']
+
+  # Perfil de AWS activo (asp, assume, AWS_PROFILE), rojo si parece produccion.
+  # tf/tg/aws usan este perfil: tiene que verse antes de un apply.
+  [[blocks.segments]]
+    style = 'diamond'
+    leading_diamond = ''
+    trailing_diamond = ' '
+    template = '{{ if .Profile }} {{ .Profile }}{{ if .Region }}@{{ .Region }}{{ end }}{{ end }}'
+    foreground = 'p:black'
+    background = 'p:orange'
+    type = 'aws'
+    foreground_templates = ['{{ if regexMatch "(?i)prod|prd|live" .Profile }}p:white{{ end }}']
+    background_templates = ['{{ if regexMatch "(?i)prod|prd|live" .Profile }}p:red{{ end }}']
+
+    [blocks.segments.properties]
+      display_default = false
+
+  # Duracion del ultimo comando, solo si paso de 3 s
+  [[blocks.segments]]
+    style = 'plain'
+    template = 'took <p:yellow><b>{{ .FormattedMs }}</b></> '
     foreground = 'p:white'
     background = 'transparent'
-    type = 'shell'
+    type = 'executiontime'
+
+    [blocks.segments.properties]
+      threshold = 3000
+      style = 'austin'
 
   [[blocks.segments]]
     style = 'plain'
@@ -141,19 +172,6 @@ final_space = true
     foreground = 'p:white'
     background = 'transparent'
     type = 'time'
-
-[[tooltips]]
-  style = 'diamond'
-  leading_diamond = ''
-  trailing_diamond = ''
-  template = '  {{ .Profile }}{{ if .Region }}@{{ .Region }}{{ end }} '
-  foreground = 'p:white'
-  background = 'p:orange'
-  type = 'aws'
-  tips = ['aws']
-
-  [tooltips.properties]
-    display_default = true
 
 [[tooltips]]
   style = 'diamond'
