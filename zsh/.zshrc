@@ -4,10 +4,14 @@
 # Lo que no se versiona va en ~/.zshrc.local.
 
 # --- Plugins (Zap) ---
-[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh" ] && source "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh"
-plug "zsh-users/zsh-autosuggestions"
-plug "zap-zsh/supercharge"
-plug "zsh-users/zsh-syntax-highlighting"
+# Instalar en una maquina nueva (sin el install.zsh oficial, que reescribe este archivo):
+#   git clone --depth 1 -b release-v1 https://github.com/zap-zsh/zap ~/.local/share/zap
+if [[ -f ${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh ]]; then
+    source "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh"
+    plug "zsh-users/zsh-autosuggestions"
+    plug "zap-zsh/supercharge"
+    plug "zsh-users/zsh-syntax-highlighting"
+fi
 
 # --- PATH ---
 typeset -U path   # sin duplicados
