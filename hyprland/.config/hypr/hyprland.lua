@@ -28,7 +28,9 @@ local editor      = "zeditor"
 ---- AUTOSTART ----
 -- =================
 hl.on("hyprland.start", function()
-    hl.exec_cmd("waybar")
+    -- theme-switch.sh --init: crea themes/current si falta, aplica GTK/cursor
+    -- y levanta waybar (asi la barra ya arranca con los symlinks del theme)
+    hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/Scripts/theme-switch.sh --init")
     hl.exec_cmd("hypridle")
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/Scripts/wallpaper.sh")
@@ -40,9 +42,7 @@ end)
 -- =============================
 ---- ENVIRONMENT VARIABLES ----
 -- =============================
-hl.env("XCURSOR_THEME",                       "Qogir-dark-cursors")
-hl.env("XCURSOR_SIZE",                        "24")
-hl.env("HYPRCURSOR_SIZE",                     "24")
+-- XCURSOR_THEME/SIZE: en themes/<theme>/hypr.lua
 hl.env("XDG_SESSION_TYPE",                    "wayland")
 hl.env("XDG_SESSION_DESKTOP",                 "Hyprland")
 hl.env("QT_QPA_PLATFORM",                     "wayland")
@@ -136,6 +136,7 @@ hl.bind(mainMod .. " + B",       hl.dsp.exec_cmd(scripts .. "hyprsunset-toggle.s
 hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd(scripts .. "gaming-mode-toggle.sh"), { description = "Modo gaming" })
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("flameshot gui"),                { description = "Captura de region" })
 hl.bind("CTRL + ALT + W",        hl.dsp.exec_cmd("killall waybar || waybar"),       { description = "Mostrar / ocultar Waybar" })
+hl.bind(mainMod .. " + T",       hl.dsp.exec_cmd(scripts .. "theme-switch.sh"),     { description = "Elegir theme" })
 hl.bind(mainMod .. " + F1",      hl.dsp.exec_cmd(scripts .. "keybinds.sh"),         { description = "Esta lista de atajos" })
 
 -- Foco con flechas

@@ -2,3 +2,6 @@
 *.o
 suckless/victariwm/dwm
 suckless/slstatus/slstatus
+
+# Theme activo de Hyprland (lo maneja Scripts/theme-switch.sh)
+hyprland/.config/hypr/themes/current

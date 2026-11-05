@@ -64,10 +64,11 @@ All other directories are pure configuration files with no build step.
 ## Architecture & Layout
 
 ```
-hyprland/.config/hypr/     # Wayland WM (desktop, stowed; ~/.config/hypr is a folded symlink): hyprland.lua + style.lua, hypr{idle,lock,paper,sunset}.conf, Scripts/
-waybar/.config/waybar/      # Status bar: config.jsonc + style.css
-wofi/.config/wofi/          # Launcher: config + style.css
-dunst/.config/dunst/        # Notifications (desktop): dunstrc, only overrides of /etc/dunst/dunstrc
+hyprland/.config/hypr/     # Wayland WM (desktop, stowed; ~/.config/hypr is a folded symlink): hyprland.lua + style.lua, hypr{idle,paper,sunset}.conf, Scripts/
+  themes/<theme>/           # One dir per theme (tokyonight, chicago95): see "Themes" below
+waybar/.config/waybar/      # Status bar: config.jsonc + style.css are symlinks to themes/current
+wofi/.config/wofi/          # Launcher: config (shared) + style.css (symlink to themes/current)
+dunst/.config/dunst/        # Notifications (desktop): dunstrc is a symlink to themes/current (only overrides of /etc/dunst/dunstrc)
 check.sh                    # Post-update checks (Hyprland/Waybar/hyprlock/hypridle/scripts); not a stow package
 
 suckless/
@@ -111,6 +112,8 @@ Lua config (`hyprland.lua` + `style.lua`), Hyprland 0.57. The session stack (way
 - hyprpaper 0.8 IPC has no `preload`/`unload`; `hyprctl hyprpaper wallpaper "MON,PATH,contain"` loads by itself (exit 1 on failure). `wallpaper.sh` retries because it starts alongside hyprpaper.
 - hyprsunset: schedule in `hyprsunset.conf` profiles; `Super+B` toggles 4000K/6500K over IPC. Avoid `identity`: hyprsunset doesn't reflect it in `temperature`.
 - Waybar: temperatures use `hwmon-path-abs` (PCI path), since `hwmonN` numbering changes between boots. `custom/cava` is centered, so right-side modules must not have `max-length` (GTK ellipsizes them instead of shifting the center). `killall waybar` doesn't kill module children: continuous `exec` scripts must die on SIGPIPE (`cava | sed -u`, no per-line subshells). GTK CSS rejects `0%, 100%` in one keyframe block (Waybar won't start).
+- Themes (`Super+T`, `Scripts/theme-switch.sh`): each `hyprland/.config/hypr/themes/<theme>/` holds `hypr.lua` (borders, gaps, rounding, blur, shadow, animations, `XCURSOR_*`), `theme.sh` (GTK/icon/cursor/font for gsettings; empty = value saved before the first switch in `~/.local/state/theme-switch/gtk-default`), `waybar.jsonc`/`waybar.css`, `wofi.css`, `dunstrc`, `hyprlock.conf`, `kitty.conf`. The active one is the gitignored symlink `themes/current`; the live files (waybar `config.jsonc`/`style.css`, wofi `style.css`, `dunstrc`, `hypr/hyprlock.conf`) are tracked relative symlinks to it, so edit the theme files, not those. `style.lua` keeps the theme-agnostic settings and `require`s `themes.current.hypr` (falls back to tokyonight). Every `hypr.lua` must set the same keys so nothing leaks after a switch. Waybar is started by `theme-switch.sh --init` from `hyprland.start` (creates `current` if missing). kitty isn't stowed on the desktop: the switcher turns `~/.config/kitty/themes/theme.conf` into a symlink (backs up the original once) and sends SIGUSR1. Wallpaper is not per theme (wallpaper.sh keeps rotating). New theme = copy a dir; `check.sh` checks every theme has all files.
+- Chicago95 theme: tiling with borders only (no hyprbars: the plugin breaks on Hyprland updates), navy active border, no rounding/blur/shadow/animations; Waybar is a bottom Win95 taskbar (Start = wofi, right click = theme picker, `wlr/taskbar`, sunken `group/notify`). Bevels are 4-color borders + inset box-shadow in GTK CSS. Needs `chicago95-theme` (AUR: GTK `Chicago95`, icons `Chicago95`, cursors `Chicago95_Cursor_Black`); missing pieces are skipped with a notification.
 - Gaming mode detects Steam games via `reaper SteamLaunch AppId=`; the Steam client itself is not a game.
 
 ## dwm (victariwm) — current state

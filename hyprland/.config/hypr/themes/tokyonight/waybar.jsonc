@@ -1,0 +1,189 @@
+{
+  "layer": "top",
+  "position": "top",
+  "margin-bottom": 0,
+  "modules-left": [
+    "custom/launcher",
+    "custom/separator",
+    "hyprland/workspaces",
+    "custom/separator",
+    "hyprland/window",
+  ],
+  "modules-center": ["custom/cava"],
+  "modules-right": [
+    "idle_inhibitor",
+    "custom/gaming-mode",
+    "temperature",
+    "temperature#2",
+    "pulseaudio",
+    "memory",
+    "cpu",
+    "battery",
+    "network",
+    "clock",
+    "clock#date",
+    "tray",
+    "custom/powermenu",
+  ],
+  "custom/separator": {
+    "exec": "echo \"|\"",
+    "format": "{}",
+  },
+  "tray": {
+    "show-passive-items": true,
+    "spacing": 10,
+  },
+  "clock": {
+    "tooltip": false,
+    "format": "  {:%H:%M}",
+  },
+  "clock#date": {
+    "format": "  {:L%a %d %b}",
+    "tooltip-format": "<tt>{calendar}</tt>",
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col": 3,
+      "format": {
+        "months": "<span color='#f5e0dc'><b>{}</b></span>",
+        "weekdays": "<span color='#f9e2af'><b>{}</b></span>",
+        "today": "<span color='#f38ba8'><b>{}</b></span>",
+      },
+    },
+    "actions": { "on-click-right": "mode" },
+    "min-length": 8,
+  },
+  "hyprland/workspaces": {
+    "format": "{icon}",
+    "disable-scroll": false,
+    "all-outputs": true,
+    "on-click": "activate",
+    "format-icons": {
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "10",
+    },
+  },
+  "hyprland/window": {
+    "format": "{}",
+    "rewrite": {
+      "(.{42}).*": "$1..",
+    },
+    "icon": true,
+    "icon-size": 22,
+  },
+  "network": {
+    "format": "{ifname}",
+    "format-wifi": "{essid} ({signalStrength}%) ",
+    "format-ethernet": " 󰈀 ({bandwidthDownBytes:>}↓{bandwidthUpBytes:>}↑)",
+    "format-disconnected": "", //An empty format will hide the module.
+    "tooltip-format": "{ifname} via {gwaddr} 󰊗",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
+    "tooltip-format-ethernet": "{ifname} \uf0c1 ({ipaddr}/{cidr})",
+    "tooltip-format-disconnected": "Disconnected",
+    "interval": 1, // Update every second for real-time monitoring
+  },
+  "temperature": {
+    "format": "{icon} {temperatureC}°C ",
+    "tooltip-format": "CPU",
+    // Ruta PCI fija (k10temp): el numero de hwmonN cambia entre arranques
+    "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:18.3/hwmon",
+    "input-filename": "temp1_input",
+    "critical-threshold": 80,
+    "format-critical": " {temperatureC}°C", // Warning when hot
+    "format-icons": ["", "", ""],
+    "interval": 2,
+  },
+  "temperature#2": {
+    "format": "{icon} {temperatureC}°C ",
+    // Ruta PCI fija (amdgpu)
+    "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:01.1/0000:01:00.0/0000:02:00.0/0000:03:00.0/hwmon",
+    "input-filename": "temp1_input",
+    "tooltip-format": "GPU",
+    "critical-threshold": 80,
+    "format-critical": " {temperatureC}°C",
+    "format-icons": ["", "", ""],
+    "interval": 2,
+  },
+  "memory": {
+    "format": "󰫗 {}% ",
+    "tooltip": false,
+  },
+  "cpu": {
+    "format": " {usage}% ",
+    "tooltip": false,
+  },
+  "pulseaudio": {
+    "format": " {volume}%",
+    "scroll-step": 1,
+    "on-click": "pavucontrol",
+  },
+  "battery": {
+    "format": "{capacity}% {icon}",
+    "format-icons": ["", "", "", "", ""],
+  },
+  "custom/powermenu": {
+    "format": "⏻ ",
+    "tooltip": false,
+    "on-click": "exec wlogout -p layer-shell",
+  },
+  "custom/launcher": {
+    "format": "",
+    "on-click": "wofi",
+    "on-click-right": "~/.config/hypr/Scripts/theme-switch.sh",
+  },
+  "custom/cava": {
+    "format": "{}",
+    "exec": "~/.config/hypr/Scripts/cava.sh",
+    "restart-interval": 5, // al iniciar sesion PipeWire puede no estar listo y cava sale
+  },
+  // "custom/pww": {
+  //   "format": "{}",
+  //   "max-length": 40,
+  //   "return-type": "json",
+  //   "exec": "pww -w spotify -f '{{title}} - {{artist}}' -p None 2> /dev/null",
+  //   "on-click": "playerctl --player=spotify play-pause 2> /dev/null",
+  //   "on-scroll-up": "playerctl --player=spotify next 2> /dev/null",
+  //   "on-scroll-down": "playerctl --player=spotify previous 2> /dev/null",
+  // },
+  // "mpris": {
+  //   "format": "{player_icon} {dynamic}",
+  //   "format-paused": "{status_icon} <i>{dynamic}</i>",
+  //   "interval": 1,
+  //   "dynamic-len": 49,
+  //   "player-icons": {
+  //     "default": "▶",
+  //     "mpv": "",
+  //     "spotify": "",
+  //     "vlc": "󰕼",
+  //   },
+  //   "status-icons": {
+  //     "paused": "⏸",
+  //   },
+  //   "ignored-players": ["brave", "librewolf", "firefox", "chromium", "chrome"],
+  // },
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": " ",
+      "deactivated": " ",
+    },
+    "tooltip": true,
+    "tooltip-format-activated": "Idle inhibitor active",
+    "tooltip-format-deactivated": "Idle inhibitor inactive",
+  },
+  "custom/gaming-mode": {
+    "format": "{}",
+    "return-type": "json",
+    "interval": 2,
+    "exec": "~/.config/hypr/Scripts/gaming-mode-status.sh",
+    "on-click": "~/.config/hypr/Scripts/gaming-mode-toggle.sh",
+    "signal": 8,
+  },
+}

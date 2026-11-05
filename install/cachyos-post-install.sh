@@ -68,7 +68,8 @@ nwg-look kvantum qt5ct qt6ct \
 power-profiles-daemon ufw \
 stow"
 APPS_AUR="brave-bin oh-my-posh-bin zap-git \
-qogir-gtk-theme qogir-icon-theme qogir-cursor-theme"
+qogir-gtk-theme qogir-icon-theme qogir-cursor-theme \
+chicago95-theme"
 
 # --- Dotfiles ---
 DOTFILES_REPO="https://github.com/0xVictari/HyprVictari.git"

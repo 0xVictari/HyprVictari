@@ -1,0 +1,62 @@
+/* Chicago95: ventana de dialogo de Win95. La franja azul de arriba simula la
+ * barra de titulo (wofi no deja poner texto ahi). */
+
+* {
+    font-family: "Microsoft Sans Serif", "MS Sans Serif", "Tahoma", sans-serif, "GoMono Nerd Font";
+    font-size: 13px;
+    color: #000000;
+    border-radius: 0;
+}
+
+window {
+    background-color: #c0c0c0;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #dfdfdf #0a0a0a #0a0a0a #dfdfdf;
+}
+
+#outer-box {
+    border-top: 18px solid #000080;
+    padding: 6px;
+}
+
+/* Campo de texto hundido, blanco */
+#input {
+    background-color: #ffffff;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: inset 1px 1px #0a0a0a;
+    outline: none;
+    padding: 3px 4px;
+    margin-bottom: 6px;
+}
+
+/* Lista hundida, blanca */
+#scroll {
+    background-color: #ffffff;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #808080 #ffffff #ffffff #808080;
+}
+
+#inner-box {
+    margin: 2px;
+}
+
+#img {
+    margin: 2px 6px 2px 2px;
+}
+
+#entry {
+    padding: 2px 4px;
+}
+
+#entry:selected {
+    background-color: #000080;
+    outline: none;
+}
+
+#entry:selected #text {
+    color: #ffffff;
+}

@@ -8,7 +8,7 @@
 # valida pero cambio de significado (dispatch de Hyprland 0.57, IPC de
 # hyprpaper 0.8), opciones que una version borro (hyprlock 0.9), CSS que GTK
 # rechaza, scripts renombrados que un bind sigue llamando. Sin --quick levanta
-# una Waybar (se ve una segunda barra ~4 s) y un hypridle de prueba.
+# una Waybar por theme (se ve una segunda barra ~4 s c/u) y un hypridle de prueba.
 # Sale con 1 si algo falla.
 
 cd "$(dirname "$(readlink -f "$0")")" || exit 1
@@ -18,6 +18,8 @@ QUICK=0
 
 HYPR=hyprland/.config/hypr
 WAYBAR=waybar/.config/waybar
+THEME_FILES=(theme.sh hypr.lua waybar.jsonc waybar.css wofi.css dunstrc hyprlock.conf kitty.conf)
+mapfile -t THEMES < <(find "$HYPR/themes" -mindepth 1 -maxdepth 1 -type d | sort)   # sin el symlink current
 fails=0
 
 ok()      { printf '  \e[32mok\e[0m    %s\n' "$*"; }
@@ -59,7 +61,7 @@ fi
 missing=()
 while read -r s; do
     [[ -x $HYPR/Scripts/$s ]] || missing+=("$s")
-done < <(grep -ohE 'Scripts/[A-Za-z0-9_.-]+\.sh' "$HYPR"/*.lua "$HYPR"/*.conf "$HYPR"/Scripts/*.sh "$WAYBAR"/config.jsonc | sed 's|^Scripts/||' | sort -u)
+done < <(grep -shoE 'Scripts/[A-Za-z0-9_.-]+\.sh' "$HYPR"/*.lua "$HYPR"/*.conf "$HYPR"/Scripts/*.sh "${THEMES[@]/%//*}" | sed 's|^Scripts/||' | sort -u)
 if (( ${#missing[@]} )); then
     fail "scripts referenciados que no existen o no son ejecutables:"; printf '%s\n' "${missing[@]}" | detail
 else
@@ -67,9 +69,29 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+section "Themes"
+cur=$(readlink "$HYPR/themes/current")
+if [[ -n $cur && -d $HYPR/themes/$cur ]]; then
+    ok "theme activo: $cur"
+else
+    warn "sin themes/current: se crea al iniciar Hyprland (theme-switch.sh --init)"
+fi
+bad=0
+for t in "${THEMES[@]}"; do
+    for f in "${THEME_FILES[@]}"; do
+        [[ -f $t/$f ]] || { fail "${t##*/}: falta $f"; bad=1; }
+    done
+done
+(( bad )) || ok "${#THEMES[@]} themes completos (${THEME_FILES[*]})"
+# Los archivos vivos tienen que ser symlinks al theme activo, no copias
+for f in "$WAYBAR"/config.jsonc "$WAYBAR"/style.css wofi/.config/wofi/style.css dunst/.config/dunst/dunstrc "$HYPR"/hyprlock.conf; do
+    [[ $(readlink "$f") == *themes/current/* ]] || fail "$f no es symlink a themes/current"
+done
+
+# ---------------------------------------------------------------------------
 section "Hyprland"
 if command -v luac >/dev/null; then
-    if out=$(luac -p "$HYPR"/*.lua 2>&1); then ok "sintaxis Lua"; else fail "luac -p"; detail <<<"$out"; fi
+    if out=$(luac -p "$HYPR"/*.lua "${THEMES[@]/%//hypr.lua}" 2>&1); then ok "sintaxis Lua"; else fail "luac -p"; detail <<<"$out"; fi
 else
     skip "luac no instalado"
 fi
@@ -91,7 +113,7 @@ else
 fi
 
 # hyprpaper >= 0.8 no tiene preload/unload/listloaded
-if out=$(grep -nE 'hyprpaper +(preload|unload|listloaded)|^[[:space:]]*preload[[:space:]]*=' "$HYPR"/*.conf "$HYPR"/Scripts/*.sh); then
+if out=$(grep -snE 'hyprpaper +(preload|unload|listloaded)|^[[:space:]]*preload[[:space:]]*=' "$HYPR"/*.conf "$HYPR"/Scripts/*.sh); then
     fail "hyprpaper: comandos que ya no existen"; detail <<<"$out"
 else
     ok "hyprpaper sin preload/unload"
@@ -105,15 +127,17 @@ if hl=$(command -v hyprlock) && command -v strings >/dev/null; then
     known=$(strings "$hl"
             sed -nE 's/^[[:space:]]*#?[[:space:]]*([a-z_]+)[[:space:]]*=.*/\1/p' /usr/share/hypr/hyprlock.conf 2>/dev/null
             printf '%s\n' color)
-    unknown=()
-    while read -r key; do
-        grep -qE "(^|:)${key}\$" <<<"$known" || unknown+=("$key")
-    done < <(sed -nE 's/^[[:space:]]*([a-z_]+)[[:space:]]*=.*/\1/p' "$HYPR"/hyprlock.conf | sort -u)
-    if (( ${#unknown[@]} )); then
-        warn "hyprlock.conf: opciones que esta version parece no conocer (las ignora):"; printf '%s\n' "${unknown[@]}" | detail
-    else
-        ok "hyprlock.conf: todas las opciones existen"
-    fi
+    for t in "${THEMES[@]}"; do
+        unknown=()
+        while read -r key; do
+            grep -qE "(^|:)${key}\$" <<<"$known" || unknown+=("$key")
+        done < <(sed -nE 's/^[[:space:]]*([a-z_]+)[[:space:]]*=.*/\1/p' "$t"/hyprlock.conf | sort -u)
+        if (( ${#unknown[@]} )); then
+            warn "${t##*/}/hyprlock.conf: opciones que esta version parece no conocer (las ignora):"; printf '%s\n' "${unknown[@]}" | detail
+        else
+            ok "${t##*/}/hyprlock.conf: todas las opciones existen"
+        fi
+    done
 else
     skip "hyprlock o strings no instalados"
 fi
@@ -128,17 +152,19 @@ fi
 # ---------------------------------------------------------------------------
 section "Waybar"
 if (( ! QUICK )) && [[ -n ${WAYLAND_DISPLAY-} ]] && command -v waybar >/dev/null; then
-    log=$(timeout 4 waybar -c "$WAYBAR"/config.jsonc -s "$WAYBAR"/style.css -l warning 2>&1)
-    rc=$?
-    # Ruido esperado: el desktop no tiene bateria; iconos del tray de algunas apps
-    out=$(grep -E '\[(warning|error|critical)\]' <<<"$log" | grep -vE 'No batteries|No icon name or pixmap')
-    if (( rc != 124 )); then
-        fail "waybar se cerro solo (codigo $rc)"; detail <<<"$log"
-    elif [[ -n $out ]]; then
-        fail "waybar reporto problemas (CSS, modulos desactivados...)"; detail <<<"$out"
-    else
-        ok "config.jsonc + style.css cargan sin advertencias"
-    fi
+    for t in "${THEMES[@]}"; do
+        log=$(timeout 4 waybar -c "$t"/waybar.jsonc -s "$t"/waybar.css -l warning 2>&1)
+        rc=$?
+        # Ruido esperado: el desktop no tiene bateria; iconos del tray de algunas apps
+        out=$(grep -E '\[(warning|error|critical)\]' <<<"$log" | grep -vE 'No batteries|No icon name or pixmap')
+        if (( rc != 124 )); then
+            fail "${t##*/}: waybar se cerro solo (codigo $rc)"; detail <<<"$log"
+        elif [[ -n $out ]]; then
+            fail "${t##*/}: waybar reporto problemas (CSS, modulos desactivados...)"; detail <<<"$out"
+        else
+            ok "${t##*/}: waybar.jsonc + waybar.css cargan sin advertencias"
+        fi
+    done
 else
     skip "waybar (--quick o sin Wayland)"
 fi

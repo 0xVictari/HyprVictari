@@ -1,0 +1,102 @@
+// Chicago95: taskbar de Win95 abajo. Start | workspaces | ventanas ... | area
+// de notificacion hundida (indicadores + tray + reloj).
+{
+  "layer": "top",
+  "position": "bottom",
+  "height": 30,
+  "spacing": 4,
+  "modules-left": ["custom/start", "hyprland/workspaces", "wlr/taskbar"],
+  "modules-right": ["group/notify"],
+
+  "custom/start": {
+    "format": "󰨡 Start",
+    "tooltip-format": "Click: aplicaciones · Click derecho: themes",
+    "on-click": "killall wofi || wofi --show drun",
+    "on-click-right": "~/.config/hypr/Scripts/theme-switch.sh",
+  },
+  "hyprland/workspaces": {
+    "format": "{name}",
+    "all-outputs": true,
+    "on-click": "activate",
+  },
+  "wlr/taskbar": {
+    "format": "{icon} {title:.22}",
+    "icon-size": 16,
+    "tooltip-format": "{title}",
+    "on-click": "activate",
+    "on-click-middle": "close",
+  },
+
+  "group/notify": {
+    "orientation": "horizontal",
+    "modules": [
+      "idle_inhibitor",
+      "custom/gaming-mode",
+      "temperature",
+      "temperature#2",
+      "cpu",
+      "memory",
+      "pulseaudio",
+      "tray",
+      "clock",
+    ],
+  },
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": { "activated": "", "deactivated": "" },
+    "tooltip-format-activated": "Idle inhibitor activo",
+    "tooltip-format-deactivated": "Idle inhibitor inactivo",
+  },
+  "custom/gaming-mode": {
+    "format": "{}",
+    "return-type": "json",
+    "interval": 2,
+    "exec": "~/.config/hypr/Scripts/gaming-mode-status.sh",
+    "on-click": "~/.config/hypr/Scripts/gaming-mode-toggle.sh",
+    "signal": 8,
+  },
+  "temperature": {
+    "format": "{temperatureC}°",
+    "tooltip-format": "CPU {temperatureC}°C",
+    // Ruta PCI fija (k10temp): el numero de hwmonN cambia entre arranques
+    "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:18.3/hwmon",
+    "input-filename": "temp1_input",
+    "critical-threshold": 80,
+    "interval": 2,
+  },
+  "temperature#2": {
+    "format": "{temperatureC}°",
+    "tooltip-format": "GPU {temperatureC}°C",
+    // Ruta PCI fija (amdgpu)
+    "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:01.1/0000:01:00.0/0000:02:00.0/0000:03:00.0/hwmon",
+    "input-filename": "temp1_input",
+    "critical-threshold": 80,
+    "interval": 2,
+  },
+  "cpu": {
+    "format": "CPU {usage}%",
+    "tooltip": false,
+  },
+  "memory": {
+    "format": "RAM {}%",
+    "tooltip": false,
+  },
+  "pulseaudio": {
+    "format": "{icon}",
+    "format-muted": "󰝟",
+    "format-icons": ["󰕿", "󰖀", "󰕾"],
+    "tooltip-format": "Volumen {volume}%",
+    "scroll-step": 1,
+    "on-click": "pavucontrol",
+  },
+  "tray": {
+    "show-passive-items": true,
+    "icon-size": 16,
+    "spacing": 6,
+  },
+  "clock": {
+    "format": "{:%H:%M}",
+    "tooltip-format": "<tt>{calendar}</tt>",
+    "calendar": { "mode": "month" },
+  },
+}
