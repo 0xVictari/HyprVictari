@@ -31,6 +31,26 @@ detail()  { sed 's/^/          /'; }
 
 in_hyprland() { [[ -n ${HYPRLAND_INSTANCE_SIGNATURE-} ]] && hyprctl version >/dev/null 2>&1; }
 
+# trial SEG CMD...: corre CMD SEG segundos en su propia sesion, deja la salida
+# en $log y el codigo en $rc (124 = seguia vivo). Mata la sesion entera: los
+# hijos (cava de waybar) heredan el pipe y con "$(timeout ...)" el script
+# quedaba colgado esperandolos.
+trial() {
+    local secs=$1 pid tmp; shift
+    tmp=$(mktemp)
+    setsid "$@" >"$tmp" 2>&1 </dev/null &
+    pid=$!
+    sleep "$secs"
+    if kill -0 "$pid" 2>/dev/null; then
+        rc=124
+        pkill -s "$pid" 2>/dev/null
+    else
+        wait "$pid"; rc=$?
+    fi
+    wait "$pid" 2>/dev/null
+    log=$(<"$tmp"); rm -f "$tmp"
+}
+
 if command -v pacman >/dev/null; then
     section "Versiones"
     pacman -Q hyprland hypridle hyprlock hyprpaper hyprsunset waybar waybar-git dunst 2>/dev/null | sort -u | sed 's/^/  /'
@@ -143,7 +163,8 @@ else
 fi
 
 if (( ! QUICK )) && in_hyprland; then
-    out=$(timeout 2 hypridle -c "$HYPR"/hypridle.conf 2>&1 | grep -E 'Config error')
+    trial 2 hypridle -c "$HYPR"/hypridle.conf
+    out=$(grep -E 'Config error' <<<"$log")
     if [[ -z $out ]]; then ok "hypridle.conf"; else fail "hypridle.conf"; detail <<<"$out"; fi
 else
     skip "hypridle.conf (--quick o sin Hyprland)"
@@ -153,8 +174,7 @@ fi
 section "Waybar"
 if (( ! QUICK )) && [[ -n ${WAYLAND_DISPLAY-} ]] && command -v waybar >/dev/null; then
     for t in "${THEMES[@]}"; do
-        log=$(timeout 4 waybar -c "$t"/waybar.jsonc -s "$t"/waybar.css -l warning 2>&1)
-        rc=$?
+        trial 4 waybar -c "$t"/waybar.jsonc -s "$t"/waybar.css -l warning
         # Ruido esperado: el desktop no tiene bateria; iconos del tray de algunas apps
         out=$(grep -E '\[(warning|error|critical)\]' <<<"$log" | grep -vE 'No batteries|No icon name or pixmap')
         if (( rc != 124 )); then

@@ -22,4 +22,10 @@ data_format = ascii
 ascii_max_range = 7
 EOF
 
-cava -p "$config_file" | sed -u "$dict"
+# Waybar mata este script al reiniciarse pero no a cava, que sobrevive huerfano
+# (no muere por SIGPIPE): se lo mata a mano. "wait" deja correr el trap enseguida.
+cava -p "$config_file" > >(sed -u "$dict") &
+cava_pid=$!
+trap 'kill "$cava_pid" 2>/dev/null' EXIT
+trap 'exit 0' TERM HUP INT
+wait "$cava_pid"

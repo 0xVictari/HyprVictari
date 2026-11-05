@@ -60,17 +60,15 @@ apply_gtk() {
     fi
 }
 
-# kitty no esta stoweado en el desktop: kitty.conf local hace
-# "include themes/theme.conf"; ese archivo pasa a ser symlink al theme.
+# kitty.conf hace "include themes/theme.conf" (default trackeado) y despues
+# "globinclude current-theme.conf": ese archivo es un symlink al theme, fuera
+# del repo (~/.config/kitty/themes si apunta al repo, no se toca).
 apply_kitty() {
-    local dir=~/.config/kitty target
-    target=$dir/themes/theme.conf
-    grep -qs 'include themes/theme.conf' "$dir/kitty.conf" || return
-    # Si ~/.config/kitty apunta al repo (stow plegado) no tocarlo
+    local dir=~/.config/kitty
+    grep -qs '^globinclude current-theme.conf' "$dir/kitty.conf" || return
+    # Si ~/.config/kitty entero apunta al repo (stow plegado) no escribir ahi
     [[ $(readlink -f "$dir") == "$(readlink -f "$themes/../../../..")"/* ]] && return
-    mkdir -p "$dir/themes"
-    [[ -f $target && ! -L $target ]] && mv -n "$target" "$target.pre-theme-switch"
-    ln -sfn "$themes/$1/kitty.conf" "$target"
+    ln -sfn "$themes/$1/kitty.conf" "$dir/current-theme.conf"
     pkill -USR1 -x kitty   # kitty recarga la config
 }
 
