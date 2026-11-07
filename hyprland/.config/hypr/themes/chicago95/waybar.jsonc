@@ -1,18 +1,23 @@
 // Chicago95: taskbar de Win95 abajo. Start | workspaces | ventanas ... | area
-// de notificacion hundida (indicadores + tray + reloj).
+// de notificacion hundida (indicadores + tray + reloj) | Apagar.
 {
   "layer": "top",
   "position": "bottom",
-  "height": 30,
+  "height": 32, // minimo que pide group/notify (con 30 Waybar avisa y usa 32 igual)
   "spacing": 4,
   "modules-left": ["custom/start", "hyprland/workspaces", "wlr/taskbar"],
-  "modules-right": ["group/notify"],
+  "modules-right": ["group/notify", "custom/power"],
 
   "custom/start": {
-    "format": "󰨡 Start",
+    "format": " Start",
     "tooltip-format": "Click: aplicaciones · Click derecho: themes",
     "on-click": "killall wofi || wofi --show drun",
     "on-click-right": "~/.config/hypr/Scripts/theme-switch.sh",
+  },
+  "custom/power": {
+    "format": "⏻ Apagar",
+    "tooltip-format": "Apagar, reiniciar, suspender, cerrar sesión (Super+Esc)",
+    "on-click": "~/.config/hypr/Scripts/power-menu.sh",
   },
   "hyprland/workspaces": {
     "format": "{name}",
@@ -74,11 +79,11 @@
     "interval": 2,
   },
   "cpu": {
-    "format": "CPU {usage}%",
+    "format": " {usage}%",
     "tooltip": false,
   },
   "memory": {
-    "format": "RAM {}%",
+    "format": "󰫗 {}%",
     "tooltip": false,
   },
   "pulseaudio": {

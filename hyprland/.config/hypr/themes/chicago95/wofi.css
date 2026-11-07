@@ -40,6 +40,13 @@ window {
     border-color: #808080 #ffffff #ffffff #808080;
 }
 
+/* El viewport y el inner-box toman el gris del GTK theme: sin esto la lista
+ * no queda blanca */
+#scroll viewport,
+#inner-box {
+    background-color: #ffffff;
+}
+
 #inner-box {
     margin: 2px;
 }

@@ -1,0 +1,709 @@
+/* Chicago95 para GTK4 (pavucontrol, file-roller...). El paquete Chicago95 solo
+ * trae GTK2/3, asi que GTK4 cae en su theme Default claro (y libadwaita en
+ * Adwaita). theme-switch.sh enlaza este archivo como ~/.config/gtk-4.0/gtk.css:
+ * el CSS de usuario tiene prioridad sobre el theme sin importar la
+ * especificidad, asi que alcanza con selectores simples que pisen lo del Default
+ * (sobre todo background-image, box-shadow y border-radius).
+ *
+ * Relieve Win95 = borde de 4 colores (arriba der abajo izq) + sombra interna:
+ *   elevado: blanco/negro + #dfdfdf/#808080    hundido: al reves
+ *   cara #c0c0c0  luz #ffffff  luz2 #dfdfdf  sombra #808080  oscuro #0a0a0a
+ *   azul #000080  tooltip #ffffe1
+ * Los colores van repetidos (como en waybar.css) para no depender de
+ * @define-color/var(), que cambian entre versiones de GTK. */
+
+/* libadwaita toma sus colores de estas variables */
+:root {
+    --window-bg-color: #c0c0c0;
+    --window-fg-color: #000000;
+    --view-bg-color: #ffffff;
+    --view-fg-color: #000000;
+    --headerbar-bg-color: #c0c0c0;
+    --headerbar-fg-color: #000000;
+    --headerbar-backdrop-color: #c0c0c0;
+    --sidebar-bg-color: #c0c0c0;
+    --sidebar-fg-color: #000000;
+    --card-bg-color: #c0c0c0;
+    --card-fg-color: #000000;
+    --dialog-bg-color: #c0c0c0;
+    --dialog-fg-color: #000000;
+    --popover-bg-color: #c0c0c0;
+    --popover-fg-color: #000000;
+    --accent-bg-color: #000080;
+    --accent-fg-color: #ffffff;
+    --accent-color: #000080;
+    --border-radius: 0;
+    --window-radius: 0;
+}
+
+* {
+    border-radius: 0;
+    text-shadow: none;
+    -gtk-icon-shadow: none;
+    outline-color: #000000;
+}
+
+/* --- Ventanas --- */
+window,
+.background,
+dialog,
+messagedialog .dialog-contents {
+    background-color: #c0c0c0;
+    color: #000000;
+}
+
+window.csd,
+window.csd.maximized {
+    box-shadow: none;
+}
+
+.view,
+textview > text,
+iconview,
+listview,
+columnview,
+gridview,
+treeview {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.dim-label,
+label.dim-label {
+    opacity: 1;
+    color: #404040;
+}
+
+*:disabled,
+label:disabled {
+    color: #808080;
+}
+
+/* --- Seleccion: azul con texto blanco --- */
+*:selected,
+selection,
+row:selected,
+.view:selected,
+textview > text > selection,
+entry > text > selection,
+label > selection {
+    background-color: #000080;
+    color: #ffffff;
+}
+
+row:selected label,
+row:selected image {
+    color: #ffffff;
+}
+
+/* --- Botones elevados --- */
+button,
+notebook > header > tabs > arrow,
+scale > trough > slider,
+switch > slider,
+scrollbar > range > trough > slider {
+    background-color: #c0c0c0;
+    background-image: none;
+    color: #000000;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
+    box-shadow: inset -1px -1px #808080, inset 1px 1px #dfdfdf;
+    transition: none;
+}
+
+button {
+    min-height: 18px;
+    padding: 3px 8px;
+}
+
+button.image-button {
+    min-width: 18px;
+    padding: 3px;
+}
+
+button.text-button {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+/* Win95 no tiene hover: el boton solo cambia al apretarlo */
+button:hover,
+notebook > header > tabs > arrow:hover,
+scale > trough > slider:hover,
+switch:hover > slider {
+    background-color: #c0c0c0;
+    background-image: none;
+    border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
+    box-shadow: inset -1px -1px #808080, inset 1px 1px #dfdfdf;
+    -gtk-icon-filter: none;
+}
+
+/* Apretado: hundido */
+button:active,
+button.keyboard-activating,
+notebook > header > tabs > arrow:active {
+    background-color: #c0c0c0;
+    background-image: none;
+    border-color: #0a0a0a #ffffff #ffffff #0a0a0a;
+    box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf;
+}
+
+/* Toggle activado: hundido sobre tramado blanco/gris, como las barras de Win95 */
+button:checked,
+button:checked:hover {
+    background-color: #c0c0c0;
+    background-image: conic-gradient(#ffffff 25%, #c0c0c0 25% 50%, #ffffff 50% 75%, #c0c0c0 75%);
+    background-size: 2px 2px;
+    border-color: #0a0a0a #ffffff #ffffff #0a0a0a;
+    box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf;
+}
+
+button:disabled,
+button:disabled label {
+    color: #808080;
+}
+
+button:disabled {
+    background-color: #c0c0c0;
+    background-image: none;
+    -gtk-icon-filter: opacity(0.5);
+}
+
+/* Foco: rectangulo punteado adentro */
+button:focus:focus-visible,
+checkbutton:focus:focus-visible,
+notebook > header > tabs > tab:focus:focus-visible {
+    outline: 1px dotted #000000;
+    outline-offset: -4px;
+}
+
+/* Botones planos (barras de herramientas, headerbar): sin borde hasta el hover */
+button.flat,
+.toolbar button,
+headerbar button,
+popover button.model {
+    background-color: transparent;
+    background-image: none;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+button.flat:hover,
+.toolbar button:hover,
+headerbar button:hover {
+    background-color: transparent;
+    border-color: #ffffff #808080 #808080 #ffffff;
+    box-shadow: none;
+}
+
+button.flat:active,
+button.flat:checked,
+.toolbar button:active,
+.toolbar button:checked,
+headerbar button:active,
+headerbar button:checked {
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: none;
+}
+
+button.suggested-action,
+button.destructive-action {
+    color: #000000;
+    background-image: none;
+    font-weight: bold;
+}
+
+button.link,
+link {
+    color: #0000ff;
+}
+
+/* Controles de ventana (CSD): botoncitos cuadrados de 16px */
+windowcontrols button {
+    min-width: 16px;
+    min-height: 14px;
+    padding: 0;
+    margin: 0 1px;
+    border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
+    box-shadow: inset -1px -1px #808080, inset 1px 1px #dfdfdf;
+}
+
+windowcontrols button > image {
+    background: none;
+    color: #000000;
+}
+
+/* --- Campos de texto hundidos, blancos --- */
+entry,
+spinbutton,
+textview,
+.frame.view,
+scrolledwindow.frame {
+    background-color: #ffffff;
+    background-image: none;
+    color: #000000;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #dfdfdf;
+}
+
+entry,
+spinbutton {
+    min-height: 20px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+entry:focus-within,
+spinbutton:focus-within {
+    outline: none;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #dfdfdf;
+}
+
+entry:disabled,
+spinbutton:disabled {
+    background-color: #c0c0c0;
+    color: #808080;
+}
+
+spinbutton > button,
+spinbutton > button:hover {
+    min-height: 0;
+    padding: 0 3px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
+    box-shadow: inset -1px -1px #808080, inset 1px 1px #dfdfdf;
+}
+
+/* --- Combos (dropdown/combobox): campo blanco hundido + boton de flecha --- */
+dropdown > button,
+combobox > button,
+dropdown > button:hover,
+combobox > button:hover,
+dropdown > button:checked,
+combobox > button:checked {
+    background-color: #ffffff;
+    background-image: none;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #dfdfdf;
+    padding: 2px 2px 2px 4px;
+}
+
+dropdown > button > box > arrow,
+combobox > button > box > arrow,
+dropdown arrow,
+combobox arrow {
+    min-width: 12px;
+    min-height: 12px;
+    padding: 2px;
+    background-color: #c0c0c0;
+    color: #000000;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
+    box-shadow: inset -1px -1px #808080, inset 1px 1px #dfdfdf;
+}
+
+/* --- Checkbox y radio: caja blanca hundida --- */
+check,
+radio,
+check:hover,
+radio:hover,
+check:checked,
+radio:checked,
+check:indeterminate,
+radio:indeterminate {
+    min-width: 11px;
+    min-height: 11px;
+    background-color: #ffffff;
+    background-image: none;
+    color: #000000;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #dfdfdf;
+}
+
+radio {
+    border-radius: 50%;
+}
+
+check:active,
+radio:active,
+check:disabled,
+radio:disabled {
+    background-color: #c0c0c0;
+}
+
+checkbutton:checked,
+checkbutton {
+    color: #000000;
+}
+
+/* --- Switch (Win95 no tiene): canaleta hundida + taco elevado --- */
+switch,
+switch:checked {
+    background-color: #ffffff;
+    background-image: none;
+    color: #000000;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: inset 1px 1px #0a0a0a;
+}
+
+switch:checked {
+    background-color: #000080;
+    color: #ffffff;
+}
+
+switch > slider {
+    min-width: 20px;
+    min-height: 20px;
+    margin: 0;
+}
+
+/* --- Tabs: la pestaña activa sube y se pega a la pagina --- */
+notebook > header {
+    background-color: #c0c0c0;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+/* La linea blanca de arriba de la pagina la dibuja el header: las pestañas
+ * bajan 1px sobre ella y solo la activa la tapa, asi queda pegada a la pagina
+ * (el stack se dibuja despues del header y taparia la pestaña) */
+notebook > header.top {
+    border-bottom: 1px solid #ffffff;
+    box-shadow: inset 0 -1px #dfdfdf;
+}
+
+notebook > header.top > tabs {
+    margin-bottom: -2px;
+    padding: 2px 2px 0 2px;
+}
+
+notebook > header > tabs > tab {
+    min-height: 18px;
+    padding: 2px 10px;
+    margin: 2px 0 2px 0;
+    background-color: #c0c0c0;
+    color: #000000;
+    border-style: solid;
+    border-width: 1px 1px 0 1px;
+    border-color: #ffffff #0a0a0a transparent #ffffff;
+    box-shadow: inset -1px 0 #808080, inset 1px 1px #dfdfdf;
+    outline: none;
+}
+
+notebook > header > tabs > tab:hover {
+    background-color: #c0c0c0;
+    box-shadow: inset -1px 0 #808080, inset 1px 1px #dfdfdf;
+}
+
+notebook > header > tabs > tab:checked {
+    margin: 0 -2px 0 -2px;
+    padding: 4px 12px 4px 12px;
+    background-color: #c0c0c0;
+    box-shadow: inset -1px 0 #808080, inset 1px 1px #dfdfdf;
+    font-weight: normal;
+}
+
+notebook > stack,
+notebook > stack:not(:only-child) {
+    background-color: #c0c0c0;
+    border-style: solid;
+    border-width: 0 1px 1px 1px;
+    border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
+    box-shadow: inset -1px -1px #808080, inset 1px 0 #dfdfdf;
+}
+
+/* --- Sliders: canaleta hundida y taco rectangular elevado --- */
+scale > trough,
+scale > trough:hover,
+scale > trough:disabled {
+    min-height: 2px;
+    min-width: 2px;
+    background-color: #c0c0c0;
+    background-image: none;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: inset 1px 1px #0a0a0a;
+    outline: none;
+}
+
+scale > trough > highlight,
+scale > trough > highlight:disabled {
+    background-color: #000080;
+    background-image: none;
+    border: none;
+}
+
+scale > trough > fill {
+    background-color: transparent;
+    border: none;
+}
+
+scale.horizontal > trough > slider {
+    min-width: 11px;
+    min-height: 21px;
+    margin: -10px -6px;
+}
+
+scale.vertical > trough > slider {
+    min-width: 21px;
+    min-height: 11px;
+    margin: -6px -10px;
+}
+
+scale > trough > slider:active {
+    border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
+}
+
+scale > marks > mark > indicator {
+    background-color: #000000;
+    color: #000000;
+}
+
+scale > marks > mark > label,
+scale > value {
+    color: #000000;
+}
+
+/* --- Barras de progreso y medidores: bloques azules (Win95) --- */
+progressbar > trough,
+levelbar > trough {
+    background-color: #c0c0c0;
+    background-image: none;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: none;
+    padding: 1px;
+}
+
+progressbar > trough > progress,
+progressbar > trough > progress.left,
+progressbar > trough > progress.right,
+levelbar > trough > block.filled,
+levelbar > trough > block.low,
+levelbar > trough > block.high,
+levelbar > trough > block.full {
+    background-color: transparent;
+    background-image: repeating-linear-gradient(to right, #000080 0 8px, transparent 8px 10px);
+    border: none;
+}
+
+progressbar.horizontal > trough {
+    min-height: 12px;
+}
+
+progressbar.horizontal > trough > progress {
+    min-height: 12px;
+}
+
+progressbar.vertical > trough {
+    min-width: 12px;
+}
+
+progressbar.vertical > trough > progress {
+    min-width: 12px;
+    background-image: repeating-linear-gradient(to top, #000080 0 8px, transparent 8px 10px);
+}
+
+levelbar > trough > block.empty {
+    background-color: transparent;
+    border: none;
+}
+
+progressbar.osd > trough > progress {
+    background-image: none;
+    background-color: #000080;
+}
+
+/* --- Separadores y marcos grabados --- */
+separator,
+separator.horizontal {
+    min-height: 1px;
+    background-color: #808080;
+    border-bottom: 1px solid #ffffff;
+}
+
+separator.vertical {
+    min-width: 1px;
+    min-height: 0;
+    background-color: #808080;
+    border-bottom: none;
+    border-right: 1px solid #ffffff;
+}
+
+frame > border,
+.frame {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: inset 1px 1px #ffffff, inset -1px -1px #808080;
+}
+
+/* --- Listas --- */
+list,
+listview,
+list.boxed-list,
+.boxed-list,
+.card {
+    background-color: #ffffff;
+    color: #000000;
+    border-color: #808080;
+    box-shadow: none;
+}
+
+list > row:hover,
+listview > row:hover {
+    background-color: transparent;
+}
+
+list > row:selected:hover,
+listview > row:selected:hover {
+    background-color: #000080;
+}
+
+/* --- Menus y popovers: caja elevada, item azul al pasar --- */
+popover > contents,
+popover.menu > contents,
+popover.background > contents {
+    background-color: #c0c0c0;
+    color: #000000;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #dfdfdf #0a0a0a #0a0a0a #dfdfdf;
+    box-shadow: inset -1px -1px #808080, inset 1px 1px #ffffff;
+    padding: 2px;
+}
+
+popover > arrow,
+popover.background > arrow {
+    background: none;
+    border: none;
+    box-shadow: none;
+    min-height: 0;
+    min-width: 0;
+}
+
+popover listview,
+popover list {
+    background-color: transparent;
+}
+
+popover modelbutton,
+popover listview > row,
+popover list > row,
+menubar > item,
+popover.menu modelbutton {
+    padding: 3px 18px 3px 6px;
+    background-color: transparent;
+    color: #000000;
+}
+
+popover modelbutton:hover,
+popover modelbutton:selected,
+popover listview > row:hover,
+popover listview > row:selected,
+popover list > row:hover,
+popover list > row:selected,
+menubar > item:hover,
+menubar > item:selected {
+    background-color: #000080;
+    color: #ffffff;
+}
+
+popover listview > row:hover label,
+popover listview > row:selected label,
+popover listview > row:hover image,
+popover listview > row:selected image,
+popover modelbutton:hover label,
+popover modelbutton:hover image {
+    color: #ffffff;
+}
+
+menubar {
+    background-color: #c0c0c0;
+    box-shadow: none;
+    padding: 0;
+}
+
+/* --- Barra de titulo / headerbar: barra de herramientas gris --- */
+headerbar,
+headerbar:backdrop,
+.titlebar {
+    background-color: #c0c0c0;
+    background-image: none;
+    color: #000000;
+    border-bottom: 1px solid #808080;
+    box-shadow: inset 0 -1px #ffffff;
+    min-height: 32px;
+}
+
+headerbar .title,
+.titlebar .title {
+    font-weight: bold;
+}
+
+/* --- Scrollbars --- */
+scrollbar,
+scrollbar.overlay-indicator {
+    background-color: transparent;
+    border: none;
+}
+
+scrollbar > range > trough {
+    background-image: conic-gradient(#ffffff 25%, #c0c0c0 25% 50%, #ffffff 50% 75%, #c0c0c0 75%);
+    background-size: 2px 2px;
+}
+
+scrollbar.overlay-indicator:not(.hovering) > range > trough {
+    background-image: none;
+}
+
+scrollbar > range > trough > slider {
+    min-width: 12px;
+    min-height: 12px;
+    margin: 0;
+    border-radius: 0;
+    background-clip: border-box;
+}
+
+scrollbar.overlay-indicator:not(.hovering) > range > trough > slider {
+    min-width: 4px;
+    min-height: 4px;
+    border-width: 1px;
+    box-shadow: none;
+}
+
+/* --- Expander --- */
+expander {
+    color: #000000;
+}
+
+expander-widget > box > title {
+    border-radius: 0;
+}
+
+/* --- Tooltip amarillo --- */
+tooltip,
+tooltip.background {
+    background-color: #ffffe1;
+    color: #000000;
+    border: 1px solid #000000;
+    box-shadow: none;
+    padding: 2px 4px;
+}
+
+tooltip label {
+    color: #000000;
+}

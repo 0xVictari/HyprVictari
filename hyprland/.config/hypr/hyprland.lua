@@ -132,6 +132,7 @@ hl.bind(mainMod .. " + P",       hl.dsp.window.pseudo(),                        
 hl.bind(mainMod .. " + J",       hl.dsp.layout("togglesplit"),                      { description = "Alternar split (dwindle)" })
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen(),                      { description = "Pantalla completa" })
 hl.bind(mainMod .. " + L",       hl.dsp.exec_cmd("hyprlock"),                       { description = "Bloquear pantalla" })
+hl.bind(mainMod .. " + Escape",  hl.dsp.exec_cmd(scripts .. "power-menu.sh"),       { description = "Apagar / reiniciar / suspender" })
 hl.bind(mainMod .. " + B",       hl.dsp.exec_cmd(scripts .. "hyprsunset-toggle.sh"), { description = "Luz calida / neutra" })
 hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd(scripts .. "gaming-mode-toggle.sh"), { description = "Modo gaming" })
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("flameshot gui"),                { description = "Captura de region" })

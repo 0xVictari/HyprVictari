@@ -6,6 +6,10 @@ GTK_THEME="Chicago95"
 ICON_THEME="Chicago95"
 FONT="Sans 9"
 COLOR_SCHEME="default"
-# Mantener igual a hl.env de hypr.lua
-CURSOR_THEME="Chicago95_Cursor_Black"
+# El paquete no trae GTK4: CSS propio (gtk-4.0/gtk.css), que theme-switch.sh
+# enlaza en ~/.config/gtk-4.0
+GTK4_DIR="gtk-4.0"
+# Mantener igual a hl.env de hypr.lua. No Chicago95_Cursor_Black: solo trae
+# nombres X11 (left_ptr, hand2) y no los de Wayland (default, pointer, text).
+CURSOR_THEME="Chicago95 Standard Cursors Black"
 CURSOR_SIZE=24

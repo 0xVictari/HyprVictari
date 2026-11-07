@@ -4,7 +4,7 @@
 -- animaciones. Todos los themes setean las mismas claves.
 
 -- Mantener igual a CURSOR_THEME/CURSOR_SIZE de theme.sh
-hl.env("XCURSOR_THEME", "Chicago95_Cursor_Black")
+hl.env("XCURSOR_THEME", "Chicago95 Standard Cursors Black")
 hl.env("XCURSOR_SIZE",  "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 

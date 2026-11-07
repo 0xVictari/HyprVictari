@@ -103,6 +103,49 @@ for t in "${THEMES[@]}"; do
     done
 done
 (( bad )) || ok "${#THEMES[@]} themes completos (${THEME_FILES[*]})"
+# Cursor: theme.sh y hypr.lua tienen que coincidir, y el theme tiene que estar
+# instalado con los nombres de cursor-shape que piden las apps Wayland (un nombre
+# inexistente hace que el switcher no aplique el cursor y quede el anterior)
+for t in "${THEMES[@]}"; do
+    n=${t##*/}
+    cursor=$( # shellcheck source=/dev/null
+              source "$t/theme.sh" 2>/dev/null; echo "${CURSOR_THEME-}")
+    env=$(sed -nE 's/^hl\.env\("XCURSOR_THEME", *"([^"]*)"\).*/\1/p' "$t/hypr.lua")
+    [[ -n $cursor && $cursor == "$env" ]] || { fail "$n: CURSOR_THEME de theme.sh ($cursor) != XCURSOR_THEME de hypr.lua ($env)"; continue; }
+    dir=
+    for d in ~/.icons ~/.local/share/icons /usr/share/icons; do
+        [[ -d $d/$cursor/cursors ]] && { dir=$d/$cursor/cursors; break; }
+    done
+    if [[ -z $dir ]]; then
+        warn "$n: cursor \"$cursor\" no instalado"
+    elif [[ -e $dir/default && -e $dir/pointer && -e $dir/text ]]; then
+        ok "$n: cursor \"$cursor\""
+    else
+        warn "$n: cursor \"$cursor\" sin default/pointer/text (las apps Wayland no lo ven)"
+    fi
+done
+# GTK4: el CSS de usuario sale de GTK4_DIR (relativa al theme) o, vacia, de
+# <GTK_THEME>/gtk-4.0 instalado (ver apply_gtk4 en theme-switch.sh)
+for t in "${THEMES[@]}"; do
+    n=${t##*/}
+    g4=$( # shellcheck source=/dev/null
+          source "$t/theme.sh" 2>/dev/null; echo "${GTK4_DIR-}")
+    gtk=$( # shellcheck source=/dev/null
+           source "$t/theme.sh" 2>/dev/null; echo "${GTK_THEME-}")
+    src=
+    if [[ -n $g4 ]]; then
+        [[ -f $t/$g4/gtk.css ]] && src=$(readlink -f "$t/$g4") || fail "$n: GTK4_DIR=$g4 sin gtk.css"
+    else
+        for d in ~/.themes ~/.local/share/themes /usr/share/themes; do
+            [[ -f $d/$gtk/gtk-4.0/gtk.css ]] && { src=$(readlink -f "$d/$gtk/gtk-4.0"); break; }
+        done
+        [[ -n $src ]] || warn "$n: \"$gtk\" no trae gtk-4.0 (las apps GTK4 quedan con el Default claro)"
+    fi
+    [[ -n $src ]] && ok "$n: GTK4 desde ${src/#$HOME/\~}"
+    if [[ $n == "$cur" && -n $src && $(readlink -f ~/.config/gtk-4.0/gtk.css) != "$src/gtk.css" ]]; then
+        warn "~/.config/gtk-4.0/gtk.css no es el del theme activo (se arregla con: $HYPR/Scripts/theme-switch.sh $cur)"
+    fi
+done
 # Los archivos vivos tienen que ser symlinks al theme activo, no copias
 for f in "$WAYBAR"/config.jsonc "$WAYBAR"/style.css wofi/.config/wofi/style.css dunst/.config/dunst/dunstrc "$HYPR"/hyprlock.conf; do
     [[ $(readlink "$f") == *themes/current/* ]] || fail "$f no es symlink a themes/current"

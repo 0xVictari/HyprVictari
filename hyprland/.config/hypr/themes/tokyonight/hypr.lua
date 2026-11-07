@@ -2,7 +2,7 @@
 -- claves, asi al cambiar no queda nada del anterior.
 
 -- Mantener igual a CURSOR_THEME/CURSOR_SIZE de theme.sh
-hl.env("XCURSOR_THEME", "Qogir-dark-cursors")
+hl.env("XCURSOR_THEME", "Qogir-Dark")
 hl.env("XCURSOR_SIZE",  "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 

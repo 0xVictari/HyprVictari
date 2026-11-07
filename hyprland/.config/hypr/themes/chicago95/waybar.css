@@ -21,8 +21,9 @@ window#waybar {
     box-shadow: inset 0 1px #ffffff;
 }
 
-/* --- Botones elevados: Start, workspaces, ventanas --- */
+/* --- Botones elevados: Start, workspaces, ventanas, Apagar --- */
 #custom-start,
+#custom-power,
 #workspaces button,
 #taskbar button {
     background-color: #c0c0c0;
@@ -39,6 +40,10 @@ window#waybar {
     font-weight: bold;
     margin-left: 2px;
     padding: 0 6px 0 4px;
+}
+
+#custom-power {
+    margin-right: 2px;
 }
 
 #workspaces button {
@@ -60,7 +65,8 @@ window#waybar {
 /* Hundidos: workspace activo y ventana con foco (Win95 los dibuja "apretados") */
 #workspaces button.active,
 #taskbar button.active,
-#custom-start:hover {
+#custom-start:hover,
+#custom-power:hover {
     background-color: #dfdfdf;
     border-color: #0a0a0a #ffffff #ffffff #0a0a0a;
     box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf;

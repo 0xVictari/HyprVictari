@@ -6,7 +6,8 @@
 #                              aplica GTK/cursor/kitty y levanta waybar
 #
 # Un theme es una carpeta en ~/.config/hypr/themes/ con: hypr.lua, theme.sh,
-# waybar.jsonc, waybar.css, wofi.css, dunstrc, hyprlock.conf, kitty.conf.
+# waybar.jsonc, waybar.css, wofi.css, dunstrc, hyprlock.conf, kitty.conf (y
+# opcional gtk-4.0/, ver apply_gtk4).
 # El activo es el symlink themes/current (gitignoreado); config.jsonc/style.css
 # de waybar, style.css de wofi, dunstrc y hyprlock.conf son symlinks a el.
 
@@ -24,6 +25,8 @@ list_themes() {
 
 # Busca un theme de iconos/cursores o GTK en las rutas estandar
 have_icons() { local d; for d in ~/.icons ~/.local/share/icons /usr/share/icons; do [[ -d $d/$1 ]] && return 0; done; return 1; }
+# Un theme de iconos sin cursors/ (Papirus, Chicago95) no sirve de cursor
+have_cursor() { local d; for d in ~/.icons ~/.local/share/icons /usr/share/icons; do [[ -d $d/$1/cursors ]] && return 0; done; return 1; }
 have_gtk()   { local d; for d in ~/.themes ~/.local/share/themes /usr/share/themes; do [[ -d $d/$1 ]] && return 0; done; return 1; }
 
 gs() { gsettings set org.gnome.desktop.interface "$@"; }
@@ -51,13 +54,37 @@ apply_gtk() {
     if have_icons "$icons"; then gs icon-theme "$icons"; else missing+=("iconos $icons"); fi
     [[ -n $font ]] && gs font-name "$font"
     [[ -n $COLOR_SCHEME ]] && gs color-scheme "$COLOR_SCHEME"
-    if have_icons "$CURSOR_THEME"; then
+    if have_cursor "$CURSOR_THEME"; then
         gs cursor-theme "$CURSOR_THEME"
         gs cursor-size "$CURSOR_SIZE"
         hyprctl setcursor "$CURSOR_THEME" "$CURSOR_SIZE" >/dev/null
     else
         missing+=("cursor $CURSOR_THEME")
     fi
+    apply_gtk4 "$1" "$gtk"
+}
+
+# Las apps GTK4 (pavucontrol) y libadwaita (file-roller) las manda el CSS de
+# usuario ~/.config/gtk-4.0/gtk.css, que pisa al theme: nwg-look lo deja fijo en
+# un theme, y libadwaita ignora gtk-theme. Se enlazan gtk.css, gtk-dark.css y
+# assets/ desde GTK4_DIR de theme.sh (relativa al theme) o, si esta vacia, desde
+# <theme GTK>/gtk-4.0 instalado. Sin ninguno se borran los links (GTK4 usa su
+# Default claro). Las apps GTK4 abiertas lo toman recien al reiniciarlas.
+apply_gtk4() {
+    local t=$1 gtk=$2 dst=~/.config/gtk-4.0 src= d f
+    if [[ -n ${GTK4_DIR-} ]]; then
+        src=$themes/$t/$GTK4_DIR
+    else
+        for d in ~/.themes ~/.local/share/themes /usr/share/themes; do
+            [[ -f $d/$gtk/gtk-4.0/gtk.css ]] && { src=$d/$gtk/gtk-4.0; break; }
+        done
+    fi
+    [[ -f $src/gtk.css ]] || { missing+=("GTK4 de $gtk"); src=; }
+    mkdir -p "$dst"
+    for f in gtk.css gtk-dark.css assets; do
+        [[ -e $dst/$f && ! -L $dst/$f ]] && continue   # archivo propio: no se pisa
+        if [[ -n $src && -e $src/$f ]]; then ln -sfn "$src/$f" "$dst/$f"; else rm -f "$dst/$f"; fi
+    done
 }
 
 # kitty.conf hace "include themes/theme.conf" (default trackeado) y despues
