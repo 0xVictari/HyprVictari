@@ -1,5 +1,6 @@
 # Notificaciones (desktop, Hyprland). Lo que no esta aca usa el default de
-# /etc/dunst/dunstrc. Colores: paleta de Waybar + borde activo de Hyprland.
+# /etc/dunst/dunstrc. Colores: Tokyo Night Storm (fondo de kitty) + borde activo
+# de Hyprland. Waybar queda en Catppuccin Mocha a proposito.
 # Probar: killall dunst; notify-send "Titulo" "Cuerpo"  (D-Bus lo relanza solo)
 
 [global]
@@ -25,19 +26,20 @@
     mouse_right_click = close_current
 
 [urgency_low]
-    background = "#1e1e2e"
-    foreground = "#a6adc8"
+    background = "#24283b"
+    foreground = "#a9b1d6"
     frame_color = "#414868"
     timeout = 4
 
 [urgency_normal]
-    background = "#1e1e2e"
-    foreground = "#cdd6f4"
+    background = "#24283b"
+    foreground = "#c0caf5"
     frame_color = "#7aa2f7"
+    highlight = "#7aa2f7"
     timeout = 6
 
 [urgency_critical]
-    background = "#1e1e2e"
-    foreground = "#cdd6f4"
-    frame_color = "#f38ba8"
+    background = "#24283b"
+    foreground = "#c0caf5"
+    frame_color = "#f7768e"
     timeout = 0

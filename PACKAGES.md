@@ -86,8 +86,7 @@ Sale de los configs, sin verificar en la máquina. Lo instala `install/cachyos-p
 | `xdg-desktop-portal-hyprland xdg-desktop-portal-gtk qt5-wayland qt6-wayland` | integración de apps con Wayland |
 | `polkit-gnome` | agente polkit (exec en `hyprland.lua`) |
 | `waybar` | barra (`waybar/`) |
-| `wofi` | lanzador (`wofi/`, Waybar), ayuda de atajos (`Super+F1`) |
-| `wlogout` | menú de apagado (Waybar) |
+| `wofi` | lanzador (`wofi/`, Waybar), ayuda de atajos (`Super+F1`), menú de apagado (`Super+Escape`, botón de Waybar) |
 | `pavucontrol` | click en el módulo de audio de Waybar |
 | `pipewire pipewire-pulse wireplumber` | audio |
 | `brightnessctl` | brillo (bindings) |
@@ -97,7 +96,9 @@ Sale de los configs, sin verificar en la máquina. Lo instala `install/cachyos-p
 | `flameshot grim slurp wl-clipboard` | capturas y clipboard |
 | `dunst` | notificaciones (`dunst/`) |
 | `kitty` | terminal |
-| `ttf-jetbrains-mono-nerd ttf-jetbrains-mono ttf-go-nerd noto-fonts noto-fonts-emoji` | Waybar, ghostty, Zed |
+| `ttf-jetbrains-mono-nerd ttf-jetbrains-mono ttf-go-nerd noto-fonts noto-fonts-emoji` | JetBrains: Waybar, dunst, hyprlock; GoMono: kitty, wofi; ghostty, Zed |
+| `papirus-icon-theme`, `qogir-gtk-theme qogir-icon-theme qogir-cursor-theme` (AUR) | theme tokyonight (GTK, GTK4, iconos, cursor; `themes/tokyonight/theme.sh`) |
+| `chicago95-theme` (AUR) | theme chicago95 (GTK, iconos, cursor) |
 | `paru` (AUR helper) | `in` y los aliases `up/un/pl/pa/pc/po` del `.zshrc` |
 | `ly` | gestor de login (`ly@tty2`) |
 | `cinnamon xorg-server xorg-xauth nemo xed xreader xviewer` | sesión de respaldo, Nemo y Xapps (módulo `--cinnamon`) |

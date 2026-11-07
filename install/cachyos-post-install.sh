@@ -44,7 +44,7 @@ CINNAMON_AUR="nemo-fileroller"
 HYPRLAND_PACKAGES="hyprland hypridle hyprlock hyprpaper hyprsunset \
 xdg-desktop-portal-hyprland xdg-desktop-portal-gtk \
 qt5-wayland qt6-wayland \
-waybar wofi wlogout dunst \
+waybar wofi dunst \
 cava playerctl libnotify \
 kitty \
 grim slurp wl-clipboard flameshot imagemagick \

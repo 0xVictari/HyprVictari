@@ -1,6 +1,6 @@
 #!/bin/bash
-# Super+Escape / boton "Apagar" de la taskbar de Chicago95: dialogo de apagado
-# en wofi (toma el estilo del theme activo, wofi.css). Esc cancela.
+# Super+Escape y boton de apagado de Waybar (⏻ en tokyonight, "Apagar" en
+# chicago95): dialogo de apagado en wofi (toma el estilo del theme activo, wofi.css). Esc cancela.
 
 pkill -x wofi && exit 0   # segunda pulsacion: cerrar (igual que Super+R)
 

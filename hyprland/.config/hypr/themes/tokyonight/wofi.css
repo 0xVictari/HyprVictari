@@ -1,10 +1,11 @@
+/* Tokyo Night Storm, como kitty y dunst (Waybar queda en Catppuccin Mocha) */
 window {
-    background-color: #171717;
+    background-color: #24283b;
 }
 
 * {
     font-family: "GoMono Nerd Font";
-    color: #fff;
+    color: #c0caf5;
 }
 
 #scroll {
@@ -12,7 +13,7 @@ window {
 }
 
 #input {
-    background-color: #262626;
+    background-color: #1f2335;
     outline: none;
     box-shadow: none;
     border: 0;
@@ -34,7 +35,9 @@ window {
     border-radius: 0.5rem;
 }
 
+/* Seleccion: blue0, igual que kitty (la anterior, #262626 sobre #171717, daba
+   contraste 1.18 y no se distinguia que entrada estaba elegida) */
 #entry:selected {
-    background-color: #262626;
+    background-color: #3d59a1;
     outline: none;
 }
