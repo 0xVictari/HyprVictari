@@ -158,8 +158,8 @@ Zed on X11 only offers `UTF8_STRING` / `text/plain;charset=utf-8`; the Citrix Wo
 
 - **Keyboard layout:** LATAM (Latin American) — there is no `` ` `` key left of `1`; relevant when picking keybindings
 - **Modifier key:** Super (Windows key) for both Hyprland and dwm bindings
-- **Font:** GoMono Nerd Font in kitty and wofi; JetBrainsMono Nerd Font in Waybar, dunst and hyprlock (the user prefers it in the bar). Nerd Font icons are used throughout configs
-- **Color scheme (tokyonight theme):** Tokyo Night Storm (`#24283b` bg, `#7aa2f7` active borders, `#3d59a1` selection) in Hyprland borders, kitty, dunst and wofi; Waybar stays Catppuccin Mocha on purpose (user choice after a side-by-side preview)
+- **Font:** GoMono Nerd Font in kitty, wofi and hyprlock; JetBrainsMono Nerd Font in Waybar and dunst (the user prefers it in the bar). Nerd Font icons are used throughout configs
+- **Color scheme (tokyonight theme):** Tokyo Night Storm (`#24283b` bg, `#7aa2f7` active borders, `#3d59a1` selection) in Hyprland borders, kitty, dunst, wofi and hyprlock; Waybar stays Catppuccin Mocha on purpose (user choice after a side-by-side preview)
 - **Package manager:** pacman + AUR helpers (yay/paru) on the desktop; apt on the Mint laptop
 - **Git:** commits go directly to `master`; `user.email` on the laptop is a placeholder (`you@you.you`)
 

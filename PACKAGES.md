@@ -96,7 +96,7 @@ Sale de los configs, sin verificar en la máquina. Lo instala `install/cachyos-p
 | `flameshot grim slurp wl-clipboard` | capturas y clipboard |
 | `dunst` | notificaciones (`dunst/`) |
 | `kitty` | terminal |
-| `ttf-jetbrains-mono-nerd ttf-jetbrains-mono ttf-go-nerd noto-fonts noto-fonts-emoji` | JetBrains: Waybar, dunst, hyprlock; GoMono: kitty, wofi; ghostty, Zed |
+| `ttf-jetbrains-mono-nerd ttf-jetbrains-mono ttf-go-nerd noto-fonts noto-fonts-emoji` | JetBrains: Waybar, dunst; GoMono: kitty, wofi, hyprlock; ghostty, Zed |
 | `papirus-icon-theme`, `qogir-gtk-theme qogir-icon-theme qogir-cursor-theme` (AUR) | theme tokyonight (GTK, GTK4, iconos, cursor; `themes/tokyonight/theme.sh`) |
 | `chicago95-theme` (AUR) | theme chicago95 (GTK, iconos, cursor) |
 | `paru` (AUR helper) | `in` y los aliases `up/un/pl/pa/pc/po` del `.zshrc` |
