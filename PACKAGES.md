@@ -11,8 +11,8 @@ Estado verificado el 2026-11-02 en la laptop (Mint 22.2).
 
 | Qué | Para qué | Mint (apt) | Arch |
 |---|---|---|---|
-| zsh | shell | `zsh` | `zsh` |
-| Zap | plugins de zsh | instalador: `zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh) --branch release-v1` | `zap-git` (AUR) |
+| zsh | shell | `zsh` | `zsh zsh-completions` |
+| Zap | plugins de zsh | `git clone --depth 1 -b release-v1 https://github.com/zap-zsh/zap ~/.local/share/zap` (el `install.zsh` oficial reescribe `~/.zshrc`) | igual que en Mint; **no** el paquete `zap-git` del AUR, que es otro programa (issmirnov/zap, atajos web) |
 | oh-my-posh | prompt | binario en `~/.local/bin` (`curl -s https://ohmyposh.dev/install.sh \| bash -s`) | `oh-my-posh-bin` (AUR) |
 | eza | aliases `ls`/`l`/`ll`/`lt` | `eza` | `eza` |
 | neovim | `alias vim=nvim` | `neovim` | `neovim` |
@@ -78,14 +78,14 @@ Opcionales (se activan solo si existen): `~/.dotnet/tools` (ilspycmd), `~/.openc
 
 ## Desktop — Wayland / Hyprland (CachyOS)
 
-Sale de los configs, sin verificar en la máquina. Lo instala `install/cachyos-post-install.sh` (módulos `--core`, `--hyprland`, `--apps`); ver `install/README.md`.
+Sale de los configs; comparado con el Desktop el 2026-11-08. Lo instala `install/cachyos-post-install.sh` (módulos `--core`, `--cinnamon`, `--hyprland`, `--apps`, `--gaming`); ver `install/README.md`.
 
 | Paquetes | Lo usa |
 |---|---|
 | `hyprland hypridle hyprlock hyprpaper hyprsunset` | `hypr/` (lua, idle, lock, wallpaper, `hyprsunset.conf`) |
 | `xdg-desktop-portal-hyprland xdg-desktop-portal-gtk qt5-wayland qt6-wayland` | integración de apps con Wayland |
 | `polkit-gnome` | agente polkit (exec en `hyprland.lua`) |
-| `waybar` | barra (`waybar/`) |
+| `waybar-git` (AUR) | barra (`waybar/`); más estable que el `waybar` de los repos |
 | `wofi` | lanzador (`wofi/`, Waybar), ayuda de atajos (`Super+F1`), menú de apagado (`Super+Escape`, botón de Waybar) |
 | `pavucontrol` | click en el módulo de audio de Waybar |
 | `pipewire pipewire-pulse wireplumber` | audio |
@@ -101,7 +101,14 @@ Sale de los configs, sin verificar en la máquina. Lo instala `install/cachyos-p
 | `chicago95-theme` (AUR) | theme chicago95 (GTK, iconos, cursor) |
 | `paru` (AUR helper) | `in` y los aliases `up/un/pl/pa/pc/po` del `.zshrc` |
 | `ly` | gestor de login (`ly@tty2`) |
-| `cinnamon xorg-server xorg-xauth nemo xed xreader xviewer` | sesión de respaldo, Nemo y Xapps (módulo `--cinnamon`) |
+| `bluez bluez-utils blueman` | bluetooth (servicio habilitado); blueman es también el soporte de bluetooth de Cinnamon |
+| `cinnamon xorg-server xorg-xauth nemo xed xreader xviewer`, `nemo-fileroller` (AUR) | sesión de respaldo, Nemo y Xapps (módulo `--cinnamon`) |
+| `ghostty` | terminal de Cinnamon (`ghostty/`; default de Cinnamon por override de gschema) |
+| `discord element-desktop obsidian qbittorrent` (y el resto de `--apps`) | apps de usuario |
+| `cachyos-gaming-meta openmw`, `melonds-bin nugget-doom` (AUR) | módulo `--gaming`; el modo gaming detecta melonds, nugget y openmw por nombre de proceso |
+| GZDoom 4.10.0 portable (tarball oficial, no paquete) | solo doom-infinite, en `~/doomwads` (ver `install/README.md`) |
+
+Fuera del script, solo en este Desktop: `corectrl`. El driver de la GPU no activa bien el cooling y hay que activarlo a mano con corectrl.
 
 ## Pendientes detectados
 

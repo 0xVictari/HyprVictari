@@ -8,7 +8,7 @@ GAMING_APPS_FILE="$HOME/.config/hypr/gaming-apps.conf"
 if [ -f "$GAMING_APPS_FILE" ]; then
     mapfile -t GAMING_APPS < <(grep -v '^#' "$GAMING_APPS_FILE" | grep -v '^[[:space:]]*$')
 else
-    GAMING_APPS=(retroarch melonds duckstation gzdoom woof openmw)
+    GAMING_APPS=(retroarch melonds duckstation gzdoom woof nugget openmw)
 fi
 
 find_game() {

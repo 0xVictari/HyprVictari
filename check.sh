@@ -233,6 +233,43 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+section "Shell (zsh, Zap, oh-my-posh)"
+# Zap es un clon de github.com/zap-zsh/zap (lo que busca zsh/.zshrc). El paquete
+# zap-git del AUR es otro programa (issmirnov/zap, atajos web).
+zapdir=${XDG_DATA_HOME:-$HOME/.local/share}/zap
+if [[ -f $zapdir/zap.zsh ]] && git -C "$zapdir" remote get-url origin 2>/dev/null | grep -q 'zap-zsh/zap'; then
+    ok "Zap en ${zapdir/#$HOME/\~}"
+else
+    fail "falta Zap: git clone --depth 1 -b release-v1 https://github.com/zap-zsh/zap ${zapdir/#$HOME/\~}"
+fi
+if command -v pacman >/dev/null && pacman -Q zap-git >/dev/null 2>&1; then
+    warn "zap-git instalado: no es Zap de zsh, se puede sacar (pacman -Rns zap-git)"
+fi
+if command -v zsh >/dev/null; then
+    # Un zsh interactivo como el de una terminal nueva (sin las variables de
+    # oh-my-posh de esta sesion): no tiene que escribir errores y tiene que
+    # quedar todo cargado. La primera vez Zap clona los plugins (red).
+    tmp=$(mktemp)
+    err=$(cd /tmp && env -u POSH_SESSION_ID -u POSH_CONFIG -u POSH_SHELL -u ZAP_DIR \
+        timeout 30 zsh -i -c 'print "$+functions[plug] $+functions[_zsh_autosuggest_start] $+functions[_zsh_highlight] ${POSH_SHELL:-no}" >"$1"' zsh "$tmp" \
+        2>&1 >/dev/null </dev/null)
+    read -r z_zap z_sugg z_hl z_posh <"$tmp"; rm -f "$tmp"
+    [[ $z_zap == 1 ]] && ok "zsh carga Zap" || fail "zsh no carga Zap (plug no existe)"
+    if [[ $z_sugg == 1 && $z_hl == 1 ]]; then ok "plugins: autosuggestions + syntax-highlighting"
+    else fail "plugins sin cargar (autosuggestions=$z_sugg, syntax-highlighting=$z_hl)"; fi
+    [[ $z_posh == zsh ]] && ok "oh-my-posh inicializa en zsh" || fail "oh-my-posh no inicializa en zsh"
+    if [[ -n $err ]]; then fail "zsh -i escribe en stderr"; detail <<<"$err"; else ok "zsh -i arranca sin errores"; fi
+else
+    skip "zsh no instalado"
+fi
+if command -v oh-my-posh >/dev/null; then
+    out=$(env -u POSH_SESSION_ID -u POSH_CONFIG oh-my-posh print primary \
+        --config ohmyposh/.config/oh-my-posh/config.toml --shell zsh --plain 2>&1)
+    if [[ $? -eq 0 && -n $out ]]; then ok "oh-my-posh renderiza config.toml"
+    else fail "oh-my-posh no renderiza config.toml"; detail <<<"$out"; fi
+fi
+
+# ---------------------------------------------------------------------------
 section "Resultado"
 if (( fails )); then
     printf '  \e[31m%d chequeo(s) fallaron\e[0m\n' "$fails"

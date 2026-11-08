@@ -1,3 +1,7 @@
+# Terminal de la sesión Cinnamon (en Hyprland es kitty). Mismo look que kitty:
+# GoMono Nerd Font 10, padding 25, opacidad 0.85 y Tokyo Night Storm con los
+# mismos ajustes que themes/tokyonight/kitty.conf (selección #3d59a1).
+
 ### General ###
 
 mouse-hide-while-typing = true
@@ -10,18 +14,47 @@ clipboard-read = allow
 clipboard-write = allow
 
 window-inherit-working-directory = true
-window-decoration = false
+# Cinnamon es flotante: barra de título del sistema
+window-decoration = auto
+window-padding-x = 25
+window-padding-y = 25
 
 confirm-close-surface = false
 
 ### Fonts ###
 
-font-family = "JetBrains Mono"
+font-family = "GoMono Nerd Font"
 font-size = 10
 
-### Backround ###
+### Colores (Tokyo Night Storm, igual que kitty) ###
 
-background-opacity = 0.90
+background = #24283b
+foreground = #a9b1d6
+cursor-color = #c0caf5
+cursor-text = #1a1b26
+selection-background = #3d59a1
+selection-foreground = #c0caf5
+
+palette = 0=#414868
+palette = 1=#f7768e
+palette = 2=#73daca
+palette = 3=#e0af68
+palette = 4=#7aa2f7
+palette = 5=#bb9af7
+palette = 6=#7dcfff
+palette = 7=#c0caf5
+palette = 8=#414868
+palette = 9=#f7768e
+palette = 10=#73daca
+palette = 11=#e0af68
+palette = 12=#7aa2f7
+palette = 13=#bb9af7
+palette = 14=#7dcfff
+palette = 15=#c0caf5
+
+### Background ###
+
+background-opacity = 0.85
 
 ### Turn off Ligatures ###
 

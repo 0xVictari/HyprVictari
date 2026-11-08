@@ -12,8 +12,9 @@
 #   sudo ./cachyos-post-install.sh --cinnamon   # Cinnamon (Xorg) + Nemo/Xapps
 #   sudo ./cachyos-post-install.sh --hyprland   # stack Hyprland
 #   sudo ./cachyos-post-install.sh --apps       # apps de usuario + theming
-#   sudo ./cachyos-post-install.sh --dotfiles   # clonar HyprVictari + stow
-#   sudo ./cachyos-post-install.sh --all        # todo, en ese orden
+#   sudo ./cachyos-post-install.sh --dotfiles   # clonar HyprVictari + stow + Zap
+#   sudo ./cachyos-post-install.sh --all        # todo lo anterior, en ese orden
+#   sudo ./cachyos-post-install.sh --gaming     # juegos/emuladores (aparte: no entra en --all)
 #
 # Idempotente: pacman/paru con --needed, la config se reescribe solo si cambia
 # y los archivos que se pisan quedan respaldados.
@@ -31,20 +32,23 @@ gst-plugin-pipewire alsa-utils pavucontrol \
 polkit polkit-gnome gnome-keyring \
 xdg-user-dirs xdg-utils \
 brightnessctl \
+bluez bluez-utils blueman \
 ly"
 
 # --- Cinnamon: sesión de respaldo sobre Xorg + Nemo y las Xapps ---
 # xorg-xauth: ly lo necesita para arrancar sesiones X.
+# ghostty: terminal de Cinnamon (en Hyprland sigue kitty).
 CINNAMON_PACKAGES="cinnamon \
 xorg-server xorg-xauth xorg-xinit \
-nemo xed xreader xviewer"
+nemo xed xreader xviewer \
+ghostty"
 CINNAMON_AUR="nemo-fileroller"
 
 # --- Hyprland (lo que usan hypr/, waybar/ y wofi/) ---
 HYPRLAND_PACKAGES="hyprland hypridle hyprlock hyprpaper hyprsunset \
 xdg-desktop-portal-hyprland xdg-desktop-portal-gtk \
 qt5-wayland qt6-wayland \
-waybar wofi dunst \
+wofi dunst \
 cava playerctl libnotify \
 kitty \
 grim slurp wl-clipboard flameshot imagemagick \
@@ -52,29 +56,50 @@ ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-go-nerd \
 ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-mono \
 noto-fonts noto-fonts-cjk noto-fonts-emoji \
 ttf-liberation ttf-dejavu"
-HYPRLAND_AUR="icat"
+# waybar-git y no el waybar de los repos: resultó más estable.
+HYPRLAND_AUR="icat waybar-git"
 
 # --- Apps de usuario + theming ---
-APPS_PACKAGES="zsh neovim zed \
+APPS_PACKAGES="zsh zsh-completions neovim zed \
 mpv vlc \
 signal-desktop telegram-desktop \
+discord element-desktop obsidian qbittorrent \
 libreoffice-still \
 gthumb syncthing yt-dlp \
 btop ripgrep ncdu duf pv tree \
 unrar unzip rsync wget eza \
 fastfetch \
 papirus-icon-theme \
-nwg-look kvantum qt5ct qt6ct \
+nwg-look \
 power-profiles-daemon ufw \
 stow"
-APPS_AUR="brave-bin oh-my-posh-bin zap-git \
+# Ojo: el "zap-git" del AUR NO es Zap (zsh), es issmirnov/zap (atajos web).
+# Zap se clona en el módulo --dotfiles.
+APPS_AUR="brave-bin oh-my-posh-bin \
 qogir-gtk-theme qogir-icon-theme qogir-cursor-theme \
 chicago95-theme"
+
+# --- Gaming (módulo aparte, no entra en --all) ---
+# cachyos-gaming-meta: wine, proton, umu, winetricks y libs lib32 (sin Steam).
+GAMING_PACKAGES="cachyos-gaming-meta openmw"
+GAMING_AUR="melonds-bin nugget-doom"
+# doom-infinite (0.98 PP2) solo anda con GZDoom 4.10.0: su README pide ">= 4.8.2",
+# pero con versiones nuevas falla. Se usa el portable oficial, aparte del
+# sistema, en ~/doomwads (ahí van también DOOM2.WAD, el .pk3 y doom-infinite.sh,
+# a mano). No hay GZDoom/UZDoom del sistema: no se usa para nada más.
+GZDOOM_PORTABLE_URL="https://github.com/ZDoom/gzdoom/releases/download/g4.10.0/GZDoom.v4.10.0.LinuxPortable.tar.xz"
+GZDOOM_PORTABLE_SHA256="4c3a3753b187676e9acc3e807bd4e860ba048358779944427e3c44ed6912a815"
+GZDOOM_PORTABLE_DIR="GZDoom.v4.10.0.LinuxPortable"   # carpeta que trae el tarball
 
 # --- Dotfiles ---
 DOTFILES_REPO="https://github.com/0xVictari/HyprVictari.git"
 DOTFILES_PUSH="git@github.com:0xVictari/HyprVictari.git"
 DOTFILES_STOW="zsh ohmyposh hyprland waybar wofi dunst kitty ghostty zed fastfetch"
+
+# Zap (gestor de plugins de zsh): clon directo, como dice zsh/.zshrc. El
+# install.zsh oficial reescribe ~/.zshrc, y el paquete zap-git es otro programa.
+ZAP_REPO="https://github.com/zap-zsh/zap"
+ZAP_BRANCH="release-v1"
 
 # Paquetes de CachyOS que traen su propia config de Hyprland y chocan con stow
 CACHYOS_HYPR_SETTINGS="cachyos-hyprland-settings"
@@ -130,12 +155,13 @@ backup() { [[ -f "$1" ]] && cp -a "$1" "${1}.bak-${TS}" && log "Backup: ${1}.bak
 SUDO_DROPIN="/etc/sudoers.d/99-postinstall-temp"
 sudo_extend() {
     [[ -f "$SUDO_DROPIN" ]] && return
+    # El trap va recién acá: sin root (ej. --help) no hay nada que borrar.
+    trap sudo_restore EXIT INT TERM
     printf 'Defaults timestamp_timeout=120\n%s ALL=(ALL) NOPASSWD: ALL\n' "$REAL_USER" > "$SUDO_DROPIN"
     chmod 440 "$SUDO_DROPIN"
     visudo -cf "$SUDO_DROPIN" >/dev/null || { rm -f "$SUDO_DROPIN"; die "Drop-in de sudoers inválido."; }
 }
 sudo_restore() { rm -f "$SUDO_DROPIN"; }
-trap sudo_restore EXIT INT TERM
 
 # =============================================================================
 # CORE: paru + sesión base + ly
@@ -199,6 +225,7 @@ module_core() {
     pac $CORE_PACKAGES
     install_paru
     setup_ly
+    systemctl enable bluetooth.service
     touch /var/lib/.cachyos-post-core-done
     log "Core listo. pipewire/wireplumber arrancan solos como user services de systemd."
 }
@@ -217,7 +244,23 @@ module_cinnamon() {
     confirm "Instalar Cinnamon + Nemo/Xapps?" || return 0
     pac $CINNAMON_PACKAGES
     aur $CINNAMON_AUR
+    set_cinnamon_terminal
     log "Cinnamon instalado: aparece como sesión X en ly."
+}
+
+# Terminal por defecto de Cinnamon (Ctrl+Alt+T, "Abrir en terminal" de Nemo):
+# ghostty. Va como default del sistema (override de gschema); un valor que el
+# usuario ya haya elegido en dconf manda sobre esto.
+set_cinnamon_terminal() {
+    local dir=/usr/share/glib-2.0/schemas
+    local file="$dir/90_hyprvictari.gschema.override"
+    local want="[org.cinnamon.desktop.default-applications.terminal]
+exec='ghostty'
+exec-arg='-e'"
+    [[ -f "$file" && "$(<"$file")" == "$want" ]] && return
+    printf '%s\n' "$want" > "$file"
+    glib-compile-schemas "$dir"
+    log "Cinnamon: terminal por defecto -> ghostty."
 }
 
 # =============================================================================
@@ -234,6 +277,15 @@ module_hyprland() {
         if confirm "Desinstalarlo?"; then
             pacman -Rns --noconfirm "$CACHYOS_HYPR_SETTINGS"
         fi
+    fi
+
+    # El waybar de los repos (lo puede traer la edición Hyprland de CachyOS)
+    # choca con waybar-git y, con --noconfirm, pacman no acepta reemplazarlo:
+    # aborta. Se saca antes. "pacman -Qq waybar" devuelve waybar-git si ese es
+    # el instalado (lo provee), así que esto solo toca el de los repos.
+    if [[ "$(pacman -Qq waybar 2>/dev/null)" == waybar ]]; then
+        warn "Saco el waybar de los repos para instalar waybar-git."
+        pacman -Rdd --noconfirm waybar
     fi
 
     pac $HYPRLAND_PACKAGES
@@ -256,6 +308,42 @@ module_apps() {
     warn "  ufw:        sudo systemctl enable --now ufw && sudo ufw enable"
     warn "  power-prof: sudo systemctl enable --now power-profiles-daemon"
     warn "  syncthing:  systemctl --user enable --now syncthing   (como usuario)"
+}
+
+# =============================================================================
+# GAMING (no entra en --all)
+# =============================================================================
+
+# GZDoom 4.10.0 portable en ~/doomwads, solo para doom-infinite (ver arriba).
+install_gzdoom_portable() {
+    local dir="$REAL_HOME/doomwads" tmp
+    if [[ -x "$dir/$GZDOOM_PORTABLE_DIR/gzdoom" ]]; then
+        log "GZDoom 4.10.0 portable ya está en ~/doomwads."
+        return
+    fi
+    tmp="$(as_user mktemp -d)"   # del usuario: tar corre como él
+    as_user curl -fL --retry 3 -o "$tmp/gzdoom.tar.xz" "$GZDOOM_PORTABLE_URL" \
+        || { rm -rf "$tmp"; warn "No se pudo bajar GZDoom 4.10.0; lo salteo."; return; }
+    if ! echo "$GZDOOM_PORTABLE_SHA256  $tmp/gzdoom.tar.xz" | sha256sum -c --quiet; then
+        rm -rf "$tmp"
+        warn "GZDoom 4.10.0: el checksum no coincide; no lo instalo."
+        return
+    fi
+    as_user mkdir -p "$dir"
+    as_user tar -xJf "$tmp/gzdoom.tar.xz" -C "$dir"
+    rm -rf "$tmp"
+    log "GZDoom 4.10.0 portable en ~/doomwads/$GZDOOM_PORTABLE_DIR."
+    warn "doom-infinite: DOOM2.WAD, el .pk3 y doom-infinite.sh van a mano en ~/doomwads."
+}
+
+module_gaming() {
+    log "==================== GAMING ===================="
+    require_core
+    confirm "Instalar gaming (cachyos-gaming-meta, openmw, melonDS, Nugget Doom, GZDoom 4.10 portable)?" || return 0
+    pac $GAMING_PACKAGES
+    aur $GAMING_AUR
+    install_gzdoom_portable
+    log "Gaming listo."
 }
 
 # =============================================================================
@@ -304,6 +392,26 @@ dotfiles_backup_conflicts() {
     done
 }
 
+# Zap en ~/.local/share/zap, donde lo busca zsh/.zshrc. Los plugins (plug ...)
+# los clona el primer zsh interactivo.
+install_zap() {
+    local dir="$REAL_HOME/.local/share/zap"
+    if pacman -Q zap-git >/dev/null 2>&1; then
+        warn "zap-git está instalado y NO es Zap de zsh (es issmirnov/zap, atajos web): pacman -Rns zap-git"
+    fi
+    if [[ -f "$dir/zap.zsh" ]]; then
+        log "Zap ya está en ~/.local/share/zap."
+        return
+    fi
+    if [[ -e "$dir" ]]; then
+        warn "~/.local/share/zap existe pero no tiene zap.zsh; no lo toco."
+        return
+    fi
+    as_user mkdir -p "$REAL_HOME/.local/share"
+    as_user git clone --depth 1 -b "$ZAP_BRANCH" "$ZAP_REPO" "$dir"
+    log "Zap clonado en ~/.local/share/zap (los plugins se bajan al abrir zsh)."
+}
+
 module_dotfiles() {
     log "=================== DOTFILES ==================="
     confirm "Clonar HyprVictari y aplicar stow ($DOTFILES_STOW)?" || return 0
@@ -322,7 +430,9 @@ module_dotfiles() {
 
     # Directorios que deben existir como reales para que stow no los "pliegue"
     # en un symlink al repo (lo que escribieran otras herramientas iría al repo).
-    as_user mkdir -p "$REAL_HOME/.config/zsh" "$REAL_HOME/.config"
+    # kitty: theme-switch.sh deja ahí current-theme.conf y, si la carpeta
+    # apunta al repo, no la toca (kitty no cambiaría de theme nunca).
+    as_user mkdir -p "$REAL_HOME/.config/zsh" "$REAL_HOME/.config/kitty"
 
     local bdir="$REAL_HOME/.dotfiles-backup-$TS"
     dotfiles_backup_conflicts "$repo" "$bdir"
@@ -332,6 +442,8 @@ module_dotfiles() {
 
     as_user stow -d "$repo" -t "$REAL_HOME" -R $DOTFILES_STOW
     log "Stow aplicado: $DOTFILES_STOW"
+
+    install_zap
 
     local zsh_path
     zsh_path="$(command -v zsh || true)"
@@ -348,14 +460,16 @@ module_dotfiles() {
 
 usage() {
     cat <<USAGE
-Uso: sudo $0 [--core|--cinnamon|--hyprland|--apps|--dotfiles|--all]
+Uso: sudo $0 [--core|--cinnamon|--hyprland|--apps|--dotfiles|--all|--gaming]
 
-  --core       paru + sesión base (pipewire, polkit, keyring) + ly. PRIMERO.
-  --cinnamon   Cinnamon sobre Xorg + Nemo y Xapps (sesión de respaldo).
+  --core       paru + sesión base (pipewire, polkit, keyring, bluetooth) + ly. PRIMERO.
+  --cinnamon   Cinnamon sobre Xorg + Nemo, Xapps y ghostty (sesión de respaldo).
   --hyprland   Stack Hyprland (lo que usan hypr/, waybar/, wofi/).
-  --apps       Apps de usuario, theming, zsh/oh-my-posh/zap.
-  --dotfiles   Clona HyprVictari en ~/HyprVictari y hace stow (con backup).
+  --apps       Apps de usuario, theming, zsh/oh-my-posh.
+  --dotfiles   Clona HyprVictari en ~/HyprVictari, hace stow (con backup) y clona Zap.
   --all        core -> cinnamon -> hyprland -> apps -> dotfiles.
+  --gaming     cachyos-gaming-meta, openmw, melonDS, Nugget Doom y GZDoom 4.10
+               portable para doom-infinite. No entra en --all.
 
 La instalación base la hace el instalador de CachyOS: ver install/README.md.
 USAGE
@@ -377,6 +491,7 @@ main() {
         --hyprland) module_hyprland ;;
         --apps)     module_apps ;;
         --dotfiles) module_dotfiles ;;
+        --gaming)   module_gaming ;;
         --all)
             module_core
             module_cinnamon
