@@ -73,6 +73,8 @@
 | `Super+Shift+,` / `Super+Shift+.` | mover ventana al otro monitor |
 | `Super+Ctrl+Shift+,` / `Super+Ctrl+Shift+.` | mover **todas** las ventanas al otro monitor |
 
+Al iniciar la sesión y con `Super+Shift+m` corre `~/.dwm/monitor-setup.sh`: detecta la pantalla interna (`eDP*`, `LVDS*`) y la externa conectada sin depender de los nombres del driver, pone la externa arriba, apaga lo desconectado y refresca el wallpaper. La interna es el monitor 0. Resoluciones y posición de cada máquina en `~/.config/dwm/monitors.local` (no versionado); la laptop usa `INTERNAL_MODE=1280x720` y `EXTERNAL_MODE=1920x1080`. Sin ese archivo, cada pantalla va en su modo preferido.
+
 ## Teclas multimedia
 
 Volumen ±5 % y mute (`wpctl`), mute de micrófono, brillo ±5 %.
@@ -88,6 +90,8 @@ Volumen ±5 % y mute (`wpctl`), mute de micrófono, brillo ±5 %.
 | CPU/temp, RAM | btop en kitty | — | — |
 | Batería | notificación (estado, tiempo, consumo) | — | — |
 
+WiFi y temperatura salen de `~/.dwm/slstatus-wifi.sh` y `~/.dwm/slstatus-temp.sh`, que buscan la interfaz y el sensor en cada actualización (sin `wlp1s0` ni `thermal_zone` fijos). La batería sigue siendo `BAT0`.
+
 Patch statuscmd: slstatus pone `\001`…`\006` antes de cada bloque (`slstatus-src/config.h`) y dwm corre `statuscmds[]` (`victariwm/config.h`) con el botón en `$BUTTON`.
 
 ## Sesión
@@ -99,7 +103,7 @@ Patch statuscmd: slstatus pone `\001`…`\006` antes de cada bloque (`slstatus-s
 
 ## Reglas automáticas
 
-- Slack → tag 2 en la laptop (eDP-1) · Telegram → tag 3 · Gimp → tag 5
+- Slack → tag 2 en el monitor 0 (la pantalla interna) · Telegram → tag 3 · Gimp → tag 5
 - Citrix → primer tag vacío del monitor externo (sin usar el 1); sin externo, primer tag vacío de la laptop
 
 ## Recompilar

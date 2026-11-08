@@ -84,8 +84,9 @@ suckless/
   build-slstatus.sh
   # Old builds (dwm-current, vanilla dwm, vendored slstatus 1.0) live in git history; tag `suckless-pre-cleanup`
 
-dwm/.dwm/autostart.sh       # X11 session startup (run by dwm's autostart patch; stowed to ~/.dwm). Must stay distro-agnostic (e.g. polkit agent path differs Debian/Arch)
-dwm/.dwm/monitor-setup.sh   # Dual (HDMI-1 above eDP-1) / single layout + feh wallpaper refresh; used by sxhkd
+dwm/.dwm/autostart.sh       # X11 session startup (run by dwm's autostart patch; stowed to ~/.dwm). Must stay distro- and hardware-agnostic (e.g. polkit agent path differs Debian/Arch)
+dwm/.dwm/monitor-setup.sh   # Detects internal (eDP*/LVDS*) + external outputs, external above, disconnected off, feh refresh; run by autostart.sh and sxhkd. Per-machine modes in ~/.config/dwm/monitors.local (unversioned)
+dwm/.dwm/slstatus-*.sh      # wifi (interface from /proc/net/wireless) and CPU temp (x86_pkg_temp, else hwmon coretemp/k10temp/zenpower) for slstatus
 sxhkd/.config/sxhkd/sxhkdrc # X11 app keybindings
 clipboard/                  # clip-normalize script + systemd user unit (laptop only, X11)
 install/                    # CachyOS installer checklist (README.md) + cachyos-post-install.sh (run with sudo: --core/--cinnamon/--hyprland/--apps/--dotfiles; --gaming is separate, not in --all)
@@ -122,11 +123,11 @@ Lua config (`hyprland.lua` + `style.lua`), Hyprland 0.57. The session stack (way
 
 Enabled patches (besides bar modules, autostart, pertag, vanitygaps, restartsig, seamless_restart, movestack): statuscmd, scratchpads, fakefullscreen_client, shiftview_clients, sticky, focusdir, tagallmon, sendmon_center, alwayscenter, movecenter. Layouts: tile, monocle, fibonacci dwindle. Full key list in `suckless/README.md`.
 
-Rules (`config.h`): Slack → tag 2 on monitor 0 (eDP-1); Telegram → tag 3; Gimp → tag 5; scratchpads `spterm` (kitty), `spbtop`, `spdocker` (lazydocker via the mise shim at `$HOME/.local/share/mise/shims`, run through `sh -c` so no username is hardcoded; dwm lacks the zsh PATH).
+Rules (`config.h`): Slack → tag 2 on monitor 0 (the internal screen); Telegram → tag 3; Gimp → tag 5; scratchpads `spterm` (kitty), `spbtop`, `spdocker` (lazydocker via the mise shim at `$HOME/.local/share/mise/shims`, run through `sh -c` so no username is hardcoded; dwm lacks the zsh PATH).
 
 `freetag.diff` + `freetagclasses[] = { "Wfica" }` in `config.h`: Citrix's main window (non-floating) goes to the first empty tag of the largest monitor (HDMI), skipping tag 1 when there are 2+ monitors; with only the laptop, the first empty tag. It does not switch the view (user preference).
 
-Monitors (Xinerama order): 0 = eDP-1 (1280x720, below), 1 = HDMI-1 (1920x1080, above).
+Monitors (Xinerama order): 0 = internal, 1 = external above it. `monitor-setup.sh` configures the internal output first so it stays monitor 0; on the laptop that is eDP-1 at 1280x720 and HDMI-1 at 1920x1080, set in its `~/.config/dwm/monitors.local` (`INTERNAL_MODE`, `EXTERNAL_MODE`, `EXTERNAL_POS`).
 
 Keybinding gotchas:
 
@@ -140,10 +141,10 @@ Keybinding gotchas:
 `[mic, only when open] | volume (mute icon) | clock | SSID (5 chars) + band 2G/5G/6G + signal | CPU % + package temp | RAM % | battery state + %`, colored with status2d `^c#...^`, `|` dividers. Gotchas:
 
 - `awk` needs `LC_ALL=C` (Spanish locale parses `0.55` as 0).
-- Temperature reads `/sys/class/thermal/thermal_zone16/temp` (`x86_pkg_temp`); if it shows `n/a` after a kernel update, find the zone again.
+- Wifi and temperature are `run_command`s calling `~/.dwm/slstatus-wifi.sh` and `~/.dwm/slstatus-temp.sh` (dwm stow package), which find the interface and the sensor on every call: `thermal_zoneN`/`hwmonN` numbering changes between boots and kernels, so fixed paths ended up showing `n/a`. Both use only sh builtins plus `iwgetid`/`awk`; test them under dash (Mint's `/bin/sh`). Battery is still `BAT0`.
 - Nerd Font "md" glyphs (U+F0000+) render wider and eat the following space; flexipatch 6.8 removed status2d padding, so the status needs a leading space.
 - Clickable blocks (statuscmd, no dwmblocks): each block's format starts with an octal marker `\001`…`\006` (CPU and RAM share `\005`); dwm runs `statuscmds[]` in `victariwm/config.h` under `/bin/sh` (dash) with `$BUTTON`. Write markers in octal: `\x01` followed by a hex digit swallows it. Adding a block = new marker + new `statuscmds[]` entry.
-- Band comes from `iwgetid wlp1s0 -f -r` (Hz). Interval is 1 s for everything; keep `run_command`s cheap (no `docker`, no network calls).
+- Band comes from `iwgetid <iface> -f -r` (Hz). Interval is 1 s for everything; keep `run_command`s cheap (no `docker`, no network calls).
 
 ## Clipboard fix (Zed -> Citrix, laptop only)
 

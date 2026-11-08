@@ -1,22 +1,10 @@
 #!/bin/bash
-# Function to setup monitors
-setup_monitors() {
-    if xrandr | grep "HDMI-1 connected"; then
-        # Dual monitor setup
-        xrandr --output eDP-1 --mode 1280x720 --auto
-        xrandr --output HDMI-1 --mode 1920x1080 --above eDP-1
-        echo "dual" > /tmp/dwm-monitor-state
-    else
-        # Single monitor setup
-        xrandr --output eDP-1 --mode 1280x720 --auto
-        xrandr --output HDMI-1 --off
-        echo "single" > /tmp/dwm-monitor-state
-    fi
-}
-# Setup monitors
-setup_monitors
+# Arranque de la sesión dwm (patch autostart). Tiene que andar en Debian/Mint y
+# en Arch, en cualquier máquina: nada de nombres de hardware fijos acá.
 
-feh --bg-scale ~/Pictures/background &
+# Monitores + wallpaper (el mismo script que Super+Shift+m)
+~/.dwm/monitor-setup.sh
+
 sxhkd &
 slstatus &
 # Agente polkit: la ruta cambia entre Debian/Mint y Arch

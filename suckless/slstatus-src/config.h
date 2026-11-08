@@ -72,13 +72,13 @@ static const char unknown_str[] = "n/a";
 	/* volumen: ícono distinto si está en mute (wpctl, igual que las teclas de dwm) */
 	{ run_command,    "\002^c#f59e0b^%s^d^ | ",             "wpctl get-volume @DEFAULT_AUDIO_SINK@ | LC_ALL=C awk '{printf \"%s %d%%\", ($3==\"[MUTED]\" ? \"󰝟\" : \"󰕾\"), $2*100}'" },
 	{ datetime,       "\003^c#84cc16^󰅐 %s^d^ | ",           "%I:%M:%S %p" },
-	/* SSID cortado a 5 caracteres + banda calculada de la frecuencia */
-	{ wifi_essid,     "\004^c#3b82f6^ %.5s ",            "wlp1s0" },
-	{ run_command,    "%s ",                           "iwgetid wlp1s0 -f -r | LC_ALL=C awk '{f=$1/1e9; print (f>=5.9 ? \"6G\" : (f>=4.9 ? \"5G\" : \"2G\"))}'" },
-	{ wifi_perc,      "%s%%^d^ | ",                     "wlp1s0" },
+	/* wifi: SSID (5 caracteres), banda (2G/5G/6G) y señal; el script busca la
+	 * interfaz solo (sin nombre fijo como wlp1s0) */
+	{ run_command,    "\004^c#3b82f6^ %s^d^ | ",          "$HOME/.dwm/slstatus-wifi.sh" },
 	{ cpu_perc,       "\005^c#06b6d4^ %s%%^d^ ",          NULL },
-	/* zona x86_pkg_temp; si muestra n/a tras un update de kernel, buscarla de nuevo */
-	{ temp,           "^c#06b6d4^%s°^d^ | ",            "/sys/class/thermal/thermal_zone16/temp" },
+	/* temperatura: el script busca el sensor (x86_pkg_temp, coretemp, k10temp);
+	 * los números de thermal_zone/hwmon cambian entre boots y kernels */
+	{ run_command,    "^c#06b6d4^%s°^d^ | ",            "$HOME/.dwm/slstatus-temp.sh" },
 	{ ram_perc,       "\005^c#a855f7^󰫗 %s%%^d^ | ",         NULL },
 	{ battery_state,  "\006^c#f43f5e^ %s ",               "BAT0" },
 	{ battery_perc,   "%s%%^d^",                       "BAT0" },

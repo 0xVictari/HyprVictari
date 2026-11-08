@@ -148,8 +148,6 @@ module_build() {
     (cd "$REPO/suckless" && ./build-victariwm.sh --install)
     (cd "$REPO/suckless" && ./build-slstatus.sh --install)
     log "dwm y slstatus instalados en /usr/local/bin."
-    warn "slstatus-src/config.h tiene valores de la laptop actual: interfaz wifi"
-    warn "  (wlp1s0) y zona térmica (thermal_zone16). Revisalos en otra máquina."
 }
 
 module_system() {
@@ -188,6 +186,18 @@ BRIGHT
     rm -f "$tmp"
 }
 
+# picom trae /etc/xdg/autostart/picom.desktop sin limitar el escritorio, así que
+# Cinnamon (u otro) lo lanzaría encima de su propio compositor. dwm lo arranca
+# desde ~/.dwm/autostart.sh y Hyprland no lee el autostart XDG: se oculta solo
+# para este usuario. Si el archivo ya existe, se respeta.
+hide_picom_autostart() {
+    local dir="${XDG_CONFIG_HOME:-$HOME/.config}/autostart"
+    [[ -f /etc/xdg/autostart/picom.desktop && ! -e "$dir/picom.desktop" ]] || return 0
+    mkdir -p "$dir"
+    printf '[Desktop Entry]\nType=Application\nName=Picom\nHidden=true\n' > "$dir/picom.desktop"
+    log "picom oculto del autostart XDG (lo arranca dwm)."
+}
+
 module_dotfiles() {
     log "=================== DOTFILES ==================="
     confirm "Aplicar stow de: $STOW_PKGS?" || return 0
@@ -208,6 +218,13 @@ module_dotfiles() {
 
     systemctl --user daemon-reload || true
     log "clip-normalize lo arranca ~/.dwm/autostart.sh al iniciar dwm."
+
+    hide_picom_autostart
+
+    if [[ ! -f "${XDG_CONFIG_HOME:-$HOME/.config}/dwm/monitors.local" ]]; then
+        log "Monitores: modo preferido de cada pantalla y la externa arriba. Para"
+        log "  fijar otra cosa, ~/.config/dwm/monitors.local (ver ~/.dwm/monitor-setup.sh)."
+    fi
 
     if [[ "$(getent passwd "$USER" | cut -d: -f7)" != */zsh ]] && command -v zsh >/dev/null; then
         chsh -s "$(command -v zsh)"

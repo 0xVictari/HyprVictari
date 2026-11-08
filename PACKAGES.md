@@ -39,7 +39,7 @@ Lo instala `install/suckless-setup.sh`, que funciona en Debian/Mint y en Arch/Ca
 | Paquete apt | Uso |
 |---|---|
 | `x11-xserver-utils` | `xrandr` (monitores) |
-| `feh` | wallpaper (`~/Pictures/background`) |
+| `feh` | wallpaper (`~/Pictures/background`, si existe; lo pone `monitor-setup.sh`) |
 | `sxhkd` | keybindings de apps |
 | `picom` | compositor |
 | `xautolock` + `cinnamon-screensaver` | bloqueo a los 15 min, suspensión a los 30 |
@@ -60,7 +60,7 @@ Lo instala `install/suckless-setup.sh`, que funciona en Debian/Mint y en Arch/Ca
 
 ### slstatus (`slstatus-src/config.h`)
 
-`wireless-tools` (`iwgetid`, para la banda wifi), `wireplumber` (`wpctl`), `gawk`/`mawk` (`awk`).
+`wireless-tools` (`iwgetid`: SSID y banda en `~/.dwm/slstatus-wifi.sh`), `wireplumber` (`wpctl`), `gawk`/`mawk` (`awk`). La temperatura (`~/.dwm/slstatus-temp.sh`) solo lee `/sys`.
 
 ### Clipboard (`clipboard/`)
 
